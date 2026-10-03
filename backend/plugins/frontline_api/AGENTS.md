@@ -78,6 +78,13 @@
   (JSON). Inbound mail becomes tickets/notes via the same IDLE + sync path;
   ticket replies go through that mailbox's SMTP. `MailPipelineIntegration`
   exposes `provider`, `imap`, `smtp` without passwords (`hasPassword`).
+- Machine provisioning API for external control panels (vera.fo
+  Tenant.Backend), `controller/provision.ts`, mounted at
+  `/pl:frontline/mail/provision`, bearer `MAIL_PROVISION_TOKEN` (>=32 chars;
+  unset = disabled). `GET /` lists inboxes+pipelines (no secrets);
+  `PUT /inboxes` upserts by `address` (creates team channel by `channelName`,
+  inbox owned by the workspace owner, IMAP/SMTP); `GET|DELETE
+  /inboxes/:address`; `GET|PUT|DELETE /pipelines/:pipelineId`.
 
 - A ticket raised from a help center tells the person who raised it what
   happens to it: a confirmation when it is created, a notification when the
