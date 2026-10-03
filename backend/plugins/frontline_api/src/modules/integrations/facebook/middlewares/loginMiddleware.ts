@@ -1,5 +1,6 @@
 import {
   facebookAccountSelector,
+  FACEBOOK_POST_KIND,
   getConfig,
   resolveFacebookApp,
 } from '@/integrations/facebook/commonUtils';
@@ -65,9 +66,12 @@ export const loginMiddleware = async (req, res) => {
   const conf = {
     client_id: app.appId,
     client_secret: app.appSecret,
+    // Messenger only needs the page list + read engagement; posting
+    // permission is requested only for the Facebook post integration.
     scope:
       FACEBOOK_PERMISSIONS +
-      ',pages_read_engagement,pages_show_list,pages_manage_posts',
+      ',pages_read_engagement,pages_show_list' +
+      (kind === FACEBOOK_POST_KIND ? ',pages_manage_posts' : ''),
     redirect_uri: FACEBOOK_LOGIN_REDIRECT_URL,
   };
 
