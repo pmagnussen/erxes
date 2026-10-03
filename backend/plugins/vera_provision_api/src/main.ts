@@ -3,7 +3,7 @@ import { startPlugin } from 'erxes-api-shared/utils';
 import { router } from '~/routes';
 
 startPlugin({
-  name: 'vera_provision',
+  name: 'veraprovision',
   port: 3320,
   expressRouter: router,
   graphql: async () => ({
