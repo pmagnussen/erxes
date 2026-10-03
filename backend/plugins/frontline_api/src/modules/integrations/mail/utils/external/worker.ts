@@ -7,10 +7,17 @@ import { generateModels } from '~/connectionResolvers';
 import { debugError } from '@/integrations/mail/debuggers';
 import { describeError } from '@/integrations/mail/utils/errors';
 import { syncImapMailbox } from '@/integrations/mail/utils/external/imap';
+import {
+  ensureImapIdle,
+  stopAllImapIdle,
+  stopImapIdle,
+} from '@/integrations/mail/utils/external/idle';
 import { isExternalIntegration } from '@/integrations/mail/utils/external/settings';
 
 export const MAIL_IMAP_QUEUE = 'mail-imap-sync';
 
+// IDLE delivers new mail within seconds; this sweep only backs it up and
+// (re)claims IDLE ownership, e.g. after the replica holding it died.
 const SYNC_EVERY_MS = 60 * 1000;
 
 interface IImapSyncJob {
@@ -38,9 +45,23 @@ export const scheduleImapSync = async (job: IImapSyncJob) => {
       opts: { removeOnComplete: true, removeOnFail: true },
     },
   );
+
+  await triggerImapSync(job);
+};
+
+// A fixed job id collapses a burst of IDLE notifications into one pending
+// sync; the sync itself picks up every UID past the cursor.
+export const triggerImapSync = async (job: IImapSyncJob) => {
+  await queue().add(MAIL_IMAP_QUEUE, job, {
+    jobId: `${schedulerId(job)}-now`,
+    removeOnComplete: true,
+    removeOnFail: true,
+  });
 };
 
 export const unscheduleImapSync = async (job: IImapSyncJob) => {
+  await stopImapIdle(job.subdomain, job.integrationId);
+
   try {
     await queue().removeJobScheduler(schedulerId(job));
   } catch (e) {
@@ -68,6 +89,10 @@ export const runImapSync = async ({
     return { stopped: true };
   }
 
+  await ensureImapIdle(subdomain, integrationId, triggerImapSync).catch((e) =>
+    debugError('Could not start IMAP IDLE:', e),
+  );
+
   try {
     return await syncImapMailbox(models, subdomain, integration);
   } catch (e) {
@@ -89,4 +114,8 @@ export const startMailImapWorker = () => {
     () => undefined,
     { concurrency: 5 },
   );
+
+  process.once('SIGTERM', () => {
+    stopAllImapIdle().catch(() => undefined);
+  });
 };

@@ -65,7 +65,11 @@
   Cloudflare: `MailIntegration.provider = 'imap'` with `imap`/`smtp` settings.
   Passwords are AES-256-GCM encrypted with `MAIL_CREDENTIALS_KEY` and never
   returned by integration details. A BullMQ scheduler (`mail-imap-sync`, one per
-  inbox, every 60 s) imports new UIDs through `ingestInboundMail` — the same
+  inbox, every 60 s) backs up an IMAP IDLE watcher (`utils/external/idle.ts`)
+  that one replica owns per inbox via a Redis token lock
+  (`mail-imap-idle:<subdomain>:<id>`, 60 s TTL renewed every 20 s); an IDLE
+  `exists` event enqueues an immediate sync job (fixed jobId, so bursts
+  coalesce), reconnects use exponential backoff up to 5 min. Every sync imports new UIDs through `ingestInboundMail` — the same
   pipeline the Cloudflare webhook uses — and the first run or a UIDVALIDITY
   change only sets the cursor, so old mail is never imported. Replies go out
   through `createSmtpTransport` and are appended to the IMAP Sent folder.
