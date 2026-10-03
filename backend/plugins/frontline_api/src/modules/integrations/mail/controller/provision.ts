@@ -48,7 +48,7 @@ export const requireProvisionToken = (
   next();
 };
 
-const ownerId = async (subdomain: string) => {
+export const ownerId = async (subdomain: string) => {
   const owner = await sendTRPCMessage({
     subdomain,
     pluginName: 'core',
@@ -129,7 +129,7 @@ const pipelineView = async (
 };
 
 // Finds or creates the team channel named by the caller; the owner is admin.
-const ensureChannel = async (
+export const ensureChannel = async (
   models: IModels,
   userId: string,
   body: { channelId?: string; channelName?: string },
@@ -187,7 +187,8 @@ const handle =
     }
   };
 
-interface IInboxBody {
+export interface IInboxBody {
+  brandId?: string;
   channelId?: string;
   channelName?: string;
   name?: string;
@@ -197,8 +198,7 @@ interface IInboxBody {
   smtp?: Record<string, unknown>;
 }
 
-/** GET /mail/provision — every mail inbox and pipeline mailbox, no secrets. */
-export const listProvisioned = handle(async (_req, models) => {
+export const snapshotMail = async (models: IModels) => {
   const all = await models.MailIntegrations.find({}).lean();
 
   return {
@@ -209,7 +209,12 @@ export const listProvisioned = handle(async (_req, models) => {
       all.filter((m) => m.pipelineId).map((m) => pipelineView(models, m)),
     ),
   };
-});
+};
+
+/** GET /mail/provision — every mail inbox and pipeline mailbox, no secrets. */
+export const listProvisioned = handle(async (_req, models) =>
+  snapshotMail(models),
+);
 
 /** GET /mail/provision/inboxes/:address */
 export const getInbox = handle(async (req, models) => {
@@ -231,8 +236,15 @@ export const getInbox = handle(async (req, models) => {
  * (if named), the inbox and its IMAP/SMTP settings, or updates them. Empty
  * passwords keep the stored ones.
  */
-export const upsertInbox = handle(async (req, models, subdomain) => {
-  const body = (req.body ?? {}) as IInboxBody;
+export const upsertInbox = handle(async (req, models, subdomain) =>
+  upsertMailInbox(models, subdomain, (req.body ?? {}) as IInboxBody),
+);
+
+export const upsertMailInbox = async (
+  models: IModels,
+  subdomain: string,
+  body: IInboxBody,
+) => {
   const address = readExternalAddress(body.address);
   const userId = await ownerId(subdomain);
   const channel = await ensureChannel(models, userId, body);
@@ -283,10 +295,19 @@ export const upsertInbox = handle(async (req, models, subdomain) => {
     }
   }
 
+  if (body.brandId) {
+    const saved = await models.MailIntegrations.findOne({ address }).lean();
+
+    await models.Integrations.updateOne(
+      { _id: saved?.inboxId },
+      { $set: { brandId: body.brandId } },
+    );
+  }
+
   const saved = await models.MailIntegrations.findOne({ address }).lean();
 
   return inboxView(models, saved as IMailIntegrationDocument);
-});
+};
 
 /** DELETE /mail/provision/inboxes/:address — removes inbox and its mail. */
 export const removeInbox = handle(async (req, models, subdomain) => {
@@ -317,9 +338,21 @@ export const getPipelineMail = handle(async (req, models) => {
 });
 
 /** PUT /mail/provision/pipelines/:pipelineId — connect or update. */
-export const upsertPipelineMail = handle(async (req, models, subdomain) => {
-  const { pipelineId } = req.params;
-  const body = (req.body ?? {}) as IInboxBody & { statusId?: string };
+export const upsertPipelineMail = handle(async (req, models, subdomain) =>
+  upsertPipelineMailbox(
+    models,
+    subdomain,
+    req.params.pipelineId,
+    (req.body ?? {}) as IInboxBody & { statusId?: string },
+  ),
+);
+
+export const upsertPipelineMailbox = async (
+  models: IModels,
+  subdomain: string,
+  pipelineId: string,
+  body: IInboxBody & { statusId?: string },
+) => {
   const settings = {
     provider: MAIL_PROVIDERS.IMAP,
     address: body.address,
@@ -348,7 +381,7 @@ export const upsertPipelineMail = handle(async (req, models, subdomain) => {
         })();
 
   return pipelineView(models, saved);
-});
+};
 
 /** DELETE /mail/provision/pipelines/:pipelineId — disconnect. */
 export const removePipelineMail = handle(async (req, models, subdomain) => {
