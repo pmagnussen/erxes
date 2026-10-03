@@ -336,9 +336,7 @@ const STEP_RUNNERS: Record<
 
     if (owner.length) {
       throw new Error(
-        `The queue ${
-          connection.queueName
-        } on this Cloudflare account is already read by ${owner.join(
+        `The queue ${connection.queueName} on this Cloudflare account is already read by ${owner.join(
           ', ',
         )}. A queue accepts a single consumer, so this workspace cannot share it: disconnect the workspace that owns it, or detach that consumer first`,
       );
