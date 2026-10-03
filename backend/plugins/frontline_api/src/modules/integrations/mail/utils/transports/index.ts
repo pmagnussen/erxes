@@ -4,6 +4,8 @@ import {
   ICloudflareSendingAccount,
   readSendingAccount,
 } from '@/integrations/mail/utils/cloudflare/sending';
+import { isExternalIntegration } from '@/integrations/mail/utils/external/settings';
+import { createSmtpTransport } from '@/integrations/mail/utils/transports/smtp';
 import { createCloudflareTransport } from '@/integrations/mail/utils/transports/cloudflare';
 import { MailSendError } from '@/integrations/mail/utils/transports/common';
 import { deliver } from '@/integrations/mail/utils/transports/deliver';
@@ -40,7 +42,14 @@ const resolveSigner = async (subdomain: string): Promise<TMailSigner> => {
   return { ok: false, reason: lookup.reason };
 };
 
-const resolveTransport = async (subdomain: string): Promise<IMailTransport> => {
+const resolveTransport = async (
+  subdomain: string,
+  integration?: IMailIntegrationDocument,
+): Promise<IMailTransport> => {
+  if (integration && isExternalIntegration(integration)) {
+    return createSmtpTransport(subdomain, integration);
+  }
+
   const signer = await resolveSigner(subdomain);
 
   if (!signer.ok) {
@@ -59,8 +68,13 @@ const resolveTransport = async (subdomain: string): Promise<IMailTransport> => {
 export const sendMail = async (
   subdomain: string,
   input: ISendMailInput,
+  integration?: IMailIntegrationDocument,
 ): Promise<ISendMailResult> =>
-  await deliver(subdomain, await resolveTransport(subdomain), input);
+  await deliver(
+    subdomain,
+    await resolveTransport(subdomain, integration),
+    input,
+  );
 
 export {
   buildMessageId,

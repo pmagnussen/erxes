@@ -95,8 +95,9 @@ export const createMailDelivery = (models: IModels): MailDeliveryService => {
         message.replyTag,
       );
 
-      const senderName =
-        await models.MailIntegrations.resolveSenderName(integration);
+      const senderName = await models.MailIntegrations.resolveSenderName(
+        integration,
+      );
 
       const [inReplyTo] = await mailDelivery.toWireReferences(
         message.inboxIntegrationId,
@@ -111,29 +112,33 @@ export const createMailDelivery = (models: IModels): MailDeliveryService => {
       let result: Awaited<ReturnType<typeof sendMail>> | undefined;
 
       try {
-        result = await sendMail(subdomain, {
-          messageId: message.messageId,
-          from: integration.address,
-          fromName: senderName || undefined,
-          replyTo: replyToAddress,
-          to: message.to.map((entry) => entry.address),
-          cc: message.cc.map((entry) => entry.address),
-          bcc: message.bcc.map((entry) => entry.address),
-          subject: message.subject ?? '',
-          html: message.body ?? '',
-          reactionEmoji: message.reactionEmoji,
-          inReplyTo,
-          references,
-          automated: Boolean(message.automated),
-          attachments: (message.attachments ?? []).map((attachment) => ({
-            name: attachment.filename,
-            url: attachment.url,
-            type: attachment.type,
-            size: attachment.size,
-            contentId: attachment.contentId,
-            disposition: attachment.disposition,
-          })),
-        });
+        result = await sendMail(
+          subdomain,
+          {
+            messageId: message.messageId,
+            from: integration.address,
+            fromName: senderName || undefined,
+            replyTo: replyToAddress,
+            to: message.to.map((entry) => entry.address),
+            cc: message.cc.map((entry) => entry.address),
+            bcc: message.bcc.map((entry) => entry.address),
+            subject: message.subject ?? '',
+            html: message.body ?? '',
+            reactionEmoji: message.reactionEmoji,
+            inReplyTo,
+            references,
+            automated: Boolean(message.automated),
+            attachments: (message.attachments ?? []).map((attachment) => ({
+              name: attachment.filename,
+              url: attachment.url,
+              type: attachment.type,
+              size: attachment.size,
+              contentId: attachment.contentId,
+              disposition: attachment.disposition,
+            })),
+          },
+          integration,
+        );
       } catch (e) {
         const deliveryError = describeError(e);
 

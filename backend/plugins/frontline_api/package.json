@@ -22,8 +22,10 @@
     "fast-xml-parser": "5.2.5",
     "fbgraph": "^1.4.4",
     "graphql-tag": "^2.12.6",
+    "imapflow": "^1.0.191",
     "ioredis": "^5.6.1",
     "jsonwebtoken": "^9.0.2",
+    "mailparser": "^3.7.4",
     "moment-timezone": "^0.5.48",
     "mongodb": "^6.18.0",
     "nanoid": "^3.3.6",
@@ -36,5 +38,9 @@
     "uuid-by-string": "^4.0.0",
     "validator": "^13.15.0",
     "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "@types/mailparser": "^3.9.0",
+    "@types/nodemailer": "^6.4.17"
   }
 }

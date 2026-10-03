@@ -21,7 +21,7 @@
   and external kinds.
 - Channel integration runtimes hosted in this service and their webhook
   ingestion, message delivery, and bot automation: Facebook (Messenger + Page
-  comments), Instagram, Mail (Cloudflare Email Routing), Discord,
+  comments), Instagram, Mail (Cloudflare Email Routing, or an external IMAP/SMTP server per inbox), Discord,
   Call (SIP/CDR), and Call Pro (webhook PBX).
 - Response templates.
 - Ticketing: boards, pipelines, statuses, tickets, activities, notes, ticket
@@ -60,6 +60,16 @@
 - Other plugins' collections or service implementations.
 
 ## Current Capabilities
+
+- A mail inbox can use its own IMAP/SMTP server (e.g. Stalwart) instead of
+  Cloudflare: `MailIntegration.provider = 'imap'` with `imap`/`smtp` settings.
+  Passwords are AES-256-GCM encrypted with `MAIL_CREDENTIALS_KEY` and never
+  returned by integration details. A BullMQ scheduler (`mail-imap-sync`, one per
+  inbox, every 60 s) imports new UIDs through `ingestInboundMail` — the same
+  pipeline the Cloudflare webhook uses — and the first run or a UIDVALIDITY
+  change only sets the cursor, so old mail is never imported. Replies go out
+  through `createSmtpTransport` and are appended to the IMAP Sent folder.
+  Pipeline (ticket) addresses are still Cloudflare-only.
 
 - A ticket raised from a help center tells the person who raised it what
   happens to it: a confirmation when it is created, a notification when the

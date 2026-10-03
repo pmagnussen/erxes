@@ -14,8 +14,40 @@ const forwardVerificationSchema = new Schema(
   { _id: false },
 );
 
+const serverFields = {
+  host: { type: String, label: 'Server host name' },
+  port: { type: Number, label: 'Server port' },
+  secure: { type: Boolean, label: 'Implicit TLS on connect' },
+  user: { type: String, label: 'Login user name' },
+  password: { type: String, label: 'Login password, encrypted at rest' },
+};
+
+const smtpSettingsSchema = new Schema(serverFields, { _id: false });
+
+const imapSettingsSchema = new Schema(
+  {
+    ...serverFields,
+    mailbox: { type: String, label: 'Mailbox read for inbound mail' },
+    sentMailbox: {
+      type: String,
+      label: 'Mailbox a copy of every reply is appended to',
+    },
+    uidValidity: { type: String, label: 'UIDVALIDITY the cursor belongs to' },
+    lastUid: { type: Number, label: 'Highest UID already imported' },
+    lastSyncedAt: { type: Date, label: 'When the mailbox was last read' },
+  },
+  { _id: false },
+);
+
 export const mailIntegrationSchema = new Schema({
   _id: mongooseStringRandomId,
+  provider: {
+    type: String,
+    label:
+      'Where mail is received and sent: cloudflare (routed) or imap (an external IMAP/SMTP server). Absent means cloudflare.',
+  },
+  imap: { type: imapSettingsSchema, label: 'External IMAP server' },
+  smtp: { type: smtpSettingsSchema, label: 'External SMTP server' },
   inboxId: {
     type: String,
     unique: true,

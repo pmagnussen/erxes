@@ -8,6 +8,37 @@ import {
 } from '@/integrations/mail/utils/settings';
 import { ensureMailIndexes } from '@/integrations/mail/utils/indexes';
 import { assertSendableIntegration } from '@/integrations/mail/utils/transports/readiness';
+import { isEmailAddress } from '@/integrations/mail/utils/address';
+import { checkImapConnection } from '@/integrations/mail/utils/external/imap';
+import {
+  MAIL_PROVIDERS,
+  normalizeExternalSettings,
+} from '@/integrations/mail/utils/external/settings';
+import {
+  scheduleImapSync,
+  unscheduleImapSync,
+} from '@/integrations/mail/utils/external/worker';
+
+const readExternalAddress = (value: unknown) => {
+  const address = typeof value === 'string' ? value.trim().toLowerCase() : '';
+
+  if (!isEmailAddress(address)) {
+    throw new Error('A valid mailbox address is required');
+  }
+
+  return address;
+};
+
+const assertImapReachable = async (
+  subdomain: string,
+  imap: ReturnType<typeof normalizeExternalSettings>['imap'],
+) => {
+  const check = await checkImapConnection(subdomain, { imap });
+
+  if (!check.ok) {
+    throw new Error(`Could not sign in to the IMAP server: ${check.error}`);
+  }
+};
 
 interface IMailIntegrationInput {
   subdomain: string;
@@ -31,6 +62,28 @@ export const mailCreateIntegration = withErrorHandling(
     const parsed = jsonData ? JSON.parse(jsonData) : {};
 
     await ensureMailIndexes(models, subdomain);
+
+    if (parsed.provider === MAIL_PROVIDERS.IMAP) {
+      const address = readExternalAddress(parsed.address);
+      const { imap, smtp } = normalizeExternalSettings(subdomain, parsed);
+
+      await assertImapReachable(subdomain, imap);
+
+      const created = await models.MailIntegrations.create({
+        inboxId: integrationId,
+        provider: MAIL_PROVIDERS.IMAP,
+        address,
+        imap,
+        smtp,
+        senderName: normalizeSenderName(parsed.senderName),
+        healthStatus: MAIL_HEALTH_STATUSES.HEALTHY,
+        error: '',
+      });
+
+      await scheduleImapSync({ subdomain, integrationId: created._id });
+
+      return created;
+    }
 
     const inbox = await models.Integrations.findOne({ _id: integrationId });
 
@@ -82,6 +135,28 @@ export const mailUpdateIntegration = withErrorHandling(
       update.senderName = normalizeSenderName(parsed.senderName);
     }
 
+    if (
+      integration.provider === MAIL_PROVIDERS.IMAP &&
+      (parsed.imap || parsed.smtp || parsed.address)
+    ) {
+      const { imap, smtp } = normalizeExternalSettings(
+        subdomain,
+        parsed,
+        integration,
+      );
+
+      await assertImapReachable(subdomain, imap);
+
+      update.imap = imap;
+      update.smtp = smtp;
+
+      if (parsed.address !== undefined) {
+        update.address = readExternalAddress(parsed.address);
+      }
+
+      await scheduleImapSync({ subdomain, integrationId: integration._id });
+    }
+
     return models.MailIntegrations.updateOne(
       { inboxId: data.integrationId },
       { $set: update },
@@ -110,6 +185,17 @@ export const mailRemoveIntegrations = async ({
   await models.MailCustomers.deleteMany({
     inboxIntegrationId: integrationId,
   });
+  const external = await models.MailIntegrations.find(
+    { inboxId: integrationId, provider: MAIL_PROVIDERS.IMAP },
+    { _id: 1 },
+  ).lean();
+
+  await Promise.all(
+    external.map(({ _id }) =>
+      unscheduleImapSync({ subdomain, integrationId: String(_id) }),
+    ),
+  );
+
   await models.MailIntegrations.deleteMany({ inboxId: integrationId });
 
   if (conversationIds.length) {
@@ -131,7 +217,7 @@ export const mailIntegrationDetails = withErrorHandling(
     const integration = await models.MailIntegrations.findOne({
       inboxId: data.integrationId,
     })
-      .select(['-_id', '-inboxId'])
+      .select(['-_id', '-inboxId', '-imap.password', '-smtp.password'])
       .lean();
 
     if (!integration) {

@@ -3,6 +3,7 @@ import { initDiscord } from '@/integrations/discord/initApp';
 import { startPlugin } from 'erxes-api-shared/utils';
 import { startFacebookCommentOutboxWorker } from '@/integrations/facebook/commentOutboxWorker';
 import { startCustomDomainWorker } from '@/customdomain/worker';
+import { startMailImapWorker } from '@/integrations/mail/utils/external/worker';
 import {
   createCoreModuleProducerHandler,
   TImportExportProducers,
@@ -76,6 +77,7 @@ startPlugin({
     initDiscord();
     startFacebookCommentOutboxWorker();
     startCustomDomainWorker();
+    startMailImapWorker();
   },
 
   apolloServerContext: async (subdomain, context) => {

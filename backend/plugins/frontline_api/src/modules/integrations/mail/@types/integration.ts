@@ -9,7 +9,28 @@ export interface IMailForwardVerification {
   receivedAt?: Date;
 }
 
+export type TMailProvider = 'cloudflare' | 'imap';
+
+export interface IMailServerSettings {
+  host: string;
+  port: number;
+  secure: boolean;
+  user: string;
+  password: string;
+}
+
+export interface IMailImapSettings extends IMailServerSettings {
+  mailbox?: string;
+  sentMailbox?: string;
+  uidValidity?: string;
+  lastUid?: number;
+  lastSyncedAt?: Date;
+}
+
 export interface IMailIntegration {
+  provider?: TMailProvider;
+  imap?: IMailImapSettings;
+  smtp?: IMailServerSettings;
   inboxId?: string;
   pipelineId?: string;
   statusId?: string;

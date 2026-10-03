@@ -107,10 +107,10 @@ const isSenderMismatch = (
 ) =>
   Boolean(
     headerFrom &&
-    envelopeFrom &&
-    parseTaggedAddress(envelopeFrom).address !==
-      parseTaggedAddress(headerFrom).address &&
-    !isForwardedBy(integration, envelopeFrom, deliveredTo),
+      envelopeFrom &&
+      parseTaggedAddress(envelopeFrom).address !==
+        parseTaggedAddress(headerFrom).address &&
+      !isForwardedBy(integration, envelopeFrom, deliveredTo),
   );
 
 const normalizeSubject = (subject?: string) => {
@@ -535,9 +535,7 @@ export const receiveMailMessage = async (req: Request, res: Response) => {
     return res.status(404).json({ error: `Unknown address ${payload.to}` });
   }
 
-  const scopeId = mailScopeId(integration);
-
-  const rate = await checkInboundRate(subdomain, scopeId);
+  const rate = await checkInboundRate(subdomain, mailScopeId(integration));
 
   if (!rate.allowed) {
     return res
@@ -546,13 +544,52 @@ export const receiveMailMessage = async (req: Request, res: Response) => {
       .json({ error: 'Too many inbound messages for this inbox' });
   }
 
+  const result = await ingestInboundMail(
+    models,
+    subdomain,
+    integration,
+    payload,
+    tag,
+  );
+
+  if ('error' in result) {
+    return res.status(400).json({ error: result.error });
+  }
+
+  return res.json(result);
+};
+
+export interface IInboundMailError {
+  error: string;
+}
+
+export type TInboundMailResult =
+  | Awaited<ReturnType<typeof storeInboundMessage>>
+  | { status: 'duplicate' }
+  | IInboundMailError;
+
+/**
+ * Files one inbound message against the integration it was addressed to. The
+ * Cloudflare webhook and the IMAP poller both land here, so threading,
+ * tickets, attachments and automations behave the same whichever way the
+ * message arrived.
+ */
+export const ingestInboundMail = async (
+  models: IModels,
+  subdomain: string,
+  integration: IMailIntegrationDocument,
+  payload: IInboundMailPayload,
+  tag?: string,
+): Promise<TInboundMailResult> => {
+  const scopeId = mailScopeId(integration);
+
   const duplicate = await models.MailMessages.findOne({
     inboxIntegrationId: scopeId,
     messageId: payload.messageId,
   });
 
   if (duplicate) {
-    return res.json({ status: 'duplicate' });
+    return { status: 'duplicate' };
   }
 
   const headerFrom = normalizeAddress(payload.from?.address);
@@ -560,7 +597,7 @@ export const receiveMailMessage = async (req: Request, res: Response) => {
   const senderAddress = headerFrom || envelopeFrom;
 
   if (!senderAddress) {
-    return res.status(400).json({ error: 'from.address is required' });
+    return { error: 'from.address is required' };
   }
 
   const selfAddress = normalizeAddress(integration.address);
@@ -570,32 +607,24 @@ export const receiveMailMessage = async (req: Request, res: Response) => {
   );
 
   if (selfAddress && claimsSelf) {
-    return res.json({ status: 'ignored', reason: 'self-addressed' });
+    return { status: 'ignored', reason: 'self-addressed' };
   }
 
   try {
-    const result = await storeInboundMessage(
-      models,
-      subdomain,
-      integration,
-      payload,
-      {
-        address: senderAddress,
-        envelopeFrom: envelopeFrom || undefined,
-        mismatch: isSenderMismatch(
-          integration,
-          headerFrom,
-          envelopeFrom,
-          readDeliveredTo(payload.headers),
-        ),
-        replyTag: tag,
-      },
-    );
-
-    return res.json(result);
+    return await storeInboundMessage(models, subdomain, integration, payload, {
+      address: senderAddress,
+      envelopeFrom: envelopeFrom || undefined,
+      mismatch: isSenderMismatch(
+        integration,
+        headerFrom,
+        envelopeFrom,
+        readDeliveredTo(payload.headers),
+      ),
+      replyTag: tag,
+    });
   } catch (e) {
     if (isDuplicateKeyError(e, 'messageId')) {
-      return res.json({ status: 'duplicate' });
+      return { status: 'duplicate' };
     }
 
     await models.MailIntegrations.markUnhealthy(
