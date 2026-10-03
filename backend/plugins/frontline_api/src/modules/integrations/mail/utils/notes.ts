@@ -20,6 +20,7 @@ import {
   resolveTicketRecipient,
   sendTicketMail,
 } from '@/integrations/mail/utils/tickets';
+import { isExternalIntegration } from '@/integrations/mail/utils/external/settings';
 import { assertSendableIntegration } from '@/integrations/mail/utils/transports/readiness';
 import { splitQuotedReply } from '@/integrations/mail/utils/thread';
 import { MAIL_MESSAGE_TYPES } from '@/integrations/mail/constants';
@@ -96,7 +97,9 @@ export const prepareTicketNoteMail = async (
     return undefined;
   }
 
-  await assertSendableIntegration(subdomain);
+  if (!isExternalIntegration(integration)) {
+    await assertSendableIntegration(subdomain);
+  }
 
   const recipient = await resolveTicketRecipient(models, subdomain, ticket._id);
 

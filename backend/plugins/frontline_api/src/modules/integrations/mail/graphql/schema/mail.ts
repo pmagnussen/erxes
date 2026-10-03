@@ -86,6 +86,9 @@ export const types = `
     awaitingForwardVerification: Boolean
     healthStatus: String
     error: String
+    provider: String
+    imap: JSON
+    smtp: JSON
   }
 
   type MailTicketReplyTarget {
@@ -218,6 +221,10 @@ export const mutations = `
     senderName: String
     forwardFrom: String
     statusId: String
+    provider: String
+    address: String
+    imap: JSON
+    smtp: JSON
   ): MailPipelineIntegration
 
   mailPipelineUpdate(
@@ -225,6 +232,10 @@ export const mutations = `
     senderName: String
     forwardFrom: String
     statusId: String
+    provider: String
+    address: String
+    imap: JSON
+    smtp: JSON
   ): MailPipelineIntegration
 
   mailPipelineForwardVerified(pipelineId: String!): MailPipelineIntegration

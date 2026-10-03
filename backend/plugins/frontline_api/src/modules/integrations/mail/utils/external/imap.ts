@@ -302,3 +302,14 @@ export const checkImapConnection = async (
     return { ok: false as const, error: describeError(e) };
   }
 };
+
+export const assertImapReachable = async (
+  subdomain: string,
+  imap: IMailIntegrationDocument['imap'],
+) => {
+  const check = await checkImapConnection(subdomain, { imap });
+
+  if (!check.ok) {
+    throw new Error(`Could not sign in to the IMAP server: ${check.error}`);
+  }
+};

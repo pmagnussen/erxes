@@ -3,6 +3,7 @@ import {
   IMailIntegrationDocument,
   IMailServerSettings,
 } from '@/integrations/mail/@types/integration';
+import { isEmailAddress } from '@/integrations/mail/utils/address';
 import {
   decryptSecret,
   encryptSecret,
@@ -26,6 +27,16 @@ export interface IExternalServerInput {
   mailbox?: unknown;
   sentMailbox?: unknown;
 }
+
+export const readExternalAddress = (value: unknown) => {
+  const address = typeof value === 'string' ? value.trim().toLowerCase() : '';
+
+  if (!isEmailAddress(address)) {
+    throw new Error('A valid mailbox address is required');
+  }
+
+  return address;
+};
 
 export const isExternalIntegration = (
   integration?: Pick<IMailIntegrationDocument, 'provider'> | null,

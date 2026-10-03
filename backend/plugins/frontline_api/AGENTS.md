@@ -73,7 +73,11 @@
   pipeline the Cloudflare webhook uses — and the first run or a UIDVALIDITY
   change only sets the cursor, so old mail is never imported. Replies go out
   through `createSmtpTransport` and are appended to the IMAP Sent folder.
-  Pipeline (ticket) addresses are still Cloudflare-only.
+  Ticket pipelines can use an external mailbox too: `mailPipelineConnect` /
+  `mailPipelineUpdate` accept `provider: 'imap'`, `address`, `imap`, `smtp`
+  (JSON). Inbound mail becomes tickets/notes via the same IDLE + sync path;
+  ticket replies go through that mailbox's SMTP. `MailPipelineIntegration`
+  exposes `provider`, `imap`, `smtp` without passwords (`hasPassword`).
 
 - A ticket raised from a help center tells the person who raised it what
   happens to it: a confirmation when it is created, a notification when the

@@ -276,7 +276,7 @@ export const mailMutations = {
   async mailPipelineUpdate(
     _root: undefined,
     { pipelineId, ...settings }: { pipelineId: string } & IPipelineMailSettings,
-    { models, user, checkPermission }: IContext,
+    { subdomain, models, user, checkPermission }: IContext,
   ) {
     await checkPermission('integrationsEdit');
 
@@ -285,7 +285,7 @@ export const mailMutations = {
       user,
     );
 
-    return updatePipelineMail(models, pipelineId, settings);
+    return updatePipelineMail(models, subdomain, pipelineId, settings);
   },
 
   async mailPipelineForwardVerified(
@@ -306,7 +306,7 @@ export const mailMutations = {
   async mailPipelineDisconnect(
     _root: undefined,
     { pipelineId }: { pipelineId: string },
-    { models, user, checkPermission }: IContext,
+    { subdomain, models, user, checkPermission }: IContext,
   ) {
     await checkPermission('integrationsEdit');
 
@@ -315,7 +315,7 @@ export const mailMutations = {
       user,
     );
 
-    return disconnectPipelineMail(models, pipelineId);
+    return disconnectPipelineMail(models, subdomain, pipelineId);
   },
 
   async mailMessageRetry(

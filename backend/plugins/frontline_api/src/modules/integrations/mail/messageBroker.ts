@@ -8,37 +8,16 @@ import {
 } from '@/integrations/mail/utils/settings';
 import { ensureMailIndexes } from '@/integrations/mail/utils/indexes';
 import { assertSendableIntegration } from '@/integrations/mail/utils/transports/readiness';
-import { isEmailAddress } from '@/integrations/mail/utils/address';
-import { checkImapConnection } from '@/integrations/mail/utils/external/imap';
+import { assertImapReachable } from '@/integrations/mail/utils/external/imap';
 import {
   MAIL_PROVIDERS,
   normalizeExternalSettings,
+  readExternalAddress,
 } from '@/integrations/mail/utils/external/settings';
 import {
   scheduleImapSync,
   unscheduleImapSync,
 } from '@/integrations/mail/utils/external/worker';
-
-const readExternalAddress = (value: unknown) => {
-  const address = typeof value === 'string' ? value.trim().toLowerCase() : '';
-
-  if (!isEmailAddress(address)) {
-    throw new Error('A valid mailbox address is required');
-  }
-
-  return address;
-};
-
-const assertImapReachable = async (
-  subdomain: string,
-  imap: ReturnType<typeof normalizeExternalSettings>['imap'],
-) => {
-  const check = await checkImapConnection(subdomain, { imap });
-
-  if (!check.ok) {
-    throw new Error(`Could not sign in to the IMAP server: ${check.error}`);
-  }
-};
 
 interface IMailIntegrationInput {
   subdomain: string;
