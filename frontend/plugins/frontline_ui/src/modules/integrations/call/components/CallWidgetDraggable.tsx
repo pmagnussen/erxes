@@ -97,8 +97,8 @@ export const CallWidgetDraggableRoot = ({
 
   const checkPosition = useCallback((x: number, y: number) => {
     return {
-      x: Math.min(0, Math.max((window.innerWidth - 88) * -1, x)),
-      y: Math.min(0, Math.max((window.innerHeight - 88) * -1, y)),
+      x: Math.min(40, Math.max((window.innerWidth - 88) * -1, x)),
+      y: Math.min(40, Math.max((window.innerHeight - 88) * -1, y)),
     };
   }, []);
 
@@ -116,7 +116,6 @@ export const CallWidgetDraggableRoot = ({
     const handleResize = () => {
       setPosition((prev) => checkPosition(prev.x, prev.y));
     };
-    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [setPosition, checkPosition]);
