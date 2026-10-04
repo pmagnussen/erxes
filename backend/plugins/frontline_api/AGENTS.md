@@ -61,6 +61,16 @@
 
 ## Current Capabilities
 
+- Team/queue boards (`modules/inbox/teamBoard.ts`, resolvers
+  `graphql/resolvers/queries/teamBoard.ts`): `frontlineTeamBoard(channelId)`
+  returns agents of the caller's visible channels with core `User.chatStatus`
+  (`online`/`offline`, set by `usersSetChatStatus`; mapped to `boardStatus`
+  working/away/offline) and open (`new`/`open`) conversation counts per bucket
+  (`call`/`email`/`chat`/`messenger`/`other`, via `kindToBucket` on integration
+  kind) plus `total`. `frontlineQueueBoard` returns per visible channel the
+  assigned/unassigned open counts, oldest unassigned `createdAt`, member and
+  online-member counts. Integration scoping reuses `conversationQueryBuilder`
+  `integrationsFilter`; users are read over tRPC `users.find`.
 - A mail inbox can use its own IMAP/SMTP server (e.g. Stalwart) instead of
   Cloudflare: `MailIntegration.provider = 'imap'` with `imap`/`smtp` settings.
   Passwords are AES-256-GCM encrypted with `MAIL_CREDENTIALS_KEY` and never

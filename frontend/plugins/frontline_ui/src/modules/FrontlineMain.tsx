@@ -90,12 +90,20 @@ const FormSubmissionIndexPage = lazy(() =>
   })),
 );
 
+const TeamBoardPage = lazy(() =>
+  import('~/pages/TeamBoardPage').then((module) => ({
+    default: module.TeamBoardPage,
+  })),
+);
+
 const IntegrationsMain = () => {
   return (
     <Suspense fallback={<div />}>
       <Routes>
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/tickets" element={<Ticket />} />
+        <Route path="/team" element={<TeamBoardPage />} />
+        <Route path="/queues" element={<TeamBoardPage />} />
         <Route
           path="/calls"
           element={<Navigate to="/frontline/calls/dashboard" replace />}

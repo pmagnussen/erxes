@@ -87,6 +87,11 @@
 
 ## Current Capabilities
 
+- `/frontline/team` (Team overview) and `/frontline/queues` (Queue dashboard)
+  live in `modules/team-board` + `pages/TeamBoardPage.tsx`, polled every 15 s
+  (`frontlineTeamBoard` / `frontlineQueueBoard`). Agent rows open
+  `/frontline/inbox?assignedTo=<id>`; queue rows open
+  `/frontline/inbox?channelId=<id>&unassigned=true`.
 - Every colour field in the help center drawer and the knowledge base topic
   drawer carries a **Default** reset beside its label, showing the colour it
   would return to and hidden while the field already holds it. The help center

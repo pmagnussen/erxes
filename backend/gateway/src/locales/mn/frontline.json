@@ -1792,5 +1792,18 @@
   "customdomain-value": "Утга",
   "customdomain-status-active": "Идэвхтэй",
   "customdomain-status-pending": "Хүлээгдэж буй",
-  "retry": "Дахин оролдох"
+  "retry": "Дахин оролдох",
+  "team-overview": "Team overview",
+  "queue-dashboard": "Queue dashboard",
+  "team-board-agents": "Agents",
+  "status-working": "Working",
+  "status-away": "Away",
+  "status-offline": "Offline",
+  "search-agent": "Search agent",
+  "team-board-error": "Could not load team",
+  "no-agents": "No agents found",
+  "queue-board-error": "Could not load queues",
+  "no-queues": "No queues found",
+  "longest-waiting": "Longest waiting",
+  "agents-online": "Agents online"
 }

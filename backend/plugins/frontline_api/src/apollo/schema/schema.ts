@@ -12,6 +12,11 @@ import {
 } from '@/inbox/graphql/schemas/conversation';
 
 import {
+  queries as TeamBoardQueries,
+  types as TeamBoardTypes,
+} from '@/inbox/graphql/schemas/teamBoard';
+
+import {
   mutations as IntegrationsMutations,
   queries as IntegrationsQueries,
   types as IntegrationsTypes,
@@ -141,6 +146,7 @@ import {
 export const types = `
     ${ChannelsTypes}
     ${ConversationsTypes}
+    ${TeamBoardTypes}
     ${IntegrationsTypes}
     ${FacebookTypes}
     ${DiscordTypes}
@@ -167,6 +173,7 @@ export const types = `
 export const queries = `
     ${ChannelsQueries}
     ${ConversationsQueries}
+    ${TeamBoardQueries}
     ${IntegrationsQueries}
     ${FacebookQueries}
     ${DiscordQueries}

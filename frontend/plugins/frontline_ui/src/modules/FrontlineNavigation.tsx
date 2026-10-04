@@ -7,6 +7,8 @@ import {
   IconBook,
   IconLifebuoy,
   IconPlus,
+  IconUsersGroup,
+  IconListDetails,
 } from '@tabler/icons-react';
 import { NavigationMenuLinkItem, Button, Skeleton, Badge } from 'erxes-ui';
 import { IntegrationNavigation } from '@/integrations/components/IntegrationNavigation';
@@ -37,6 +39,16 @@ export const FrontlineDestinationLinks = () => {
         name={t('tickets', 'Tickets')}
         icon={IconTicket}
         path="frontline/tickets"
+      />
+      <NavigationMenuLinkItem
+        name={t('team-overview', 'Team overview')}
+        icon={IconUsersGroup}
+        path="frontline/team"
+      />
+      <NavigationMenuLinkItem
+        name={t('queue-dashboard', 'Queue dashboard')}
+        icon={IconListDetails}
+        path="frontline/queues"
       />
       <NavigationMenuLinkItem
         name={t('reports', 'Reports')}

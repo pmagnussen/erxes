@@ -1,3 +1,4 @@
+import { teamBoardQueries } from '@/inbox/graphql/resolvers/queries/teamBoard';
 import { channelQueries } from '@/channel/graphql/resolvers/queries/channel';
 import { conversationQueries } from '@/inbox/graphql/resolvers/queries/conversations';
 import { integrationQueries } from '@/inbox/graphql/resolvers/queries/integrations';
@@ -27,6 +28,7 @@ import { responseTemplateQueries } from '~/modules/response/graphql/responseTemp
 export const queries = {
   ...channelQueries,
   ...conversationQueries,
+  ...teamBoardQueries,
   ...integrationQueries,
   ...cpInboxQueries,
   ...facebookQueries,
