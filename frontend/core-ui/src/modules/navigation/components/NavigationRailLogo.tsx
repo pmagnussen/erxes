@@ -11,7 +11,7 @@ export const NavigationRailLogo = ({ expanded }: { expanded: boolean }) => {
   const { isMobile } = Sidebar.useSidebar();
   const { t } = useTranslation('common', { keyPrefix: 'navigation' });
   const companyName =
-    organization?.orgShortName || organization?.name || 'erxes';
+    organization?.orgShortName || organization?.name || 'Framskák';
 
   return (
     <div className="mb-1 flex h-10 w-full items-center gap-1">
