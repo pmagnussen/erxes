@@ -1,3 +1,4 @@
+import { ChannelIcon } from '@/inbox/channel/components/ChannelIcon';
 import { useGetChannels } from '@/channels/hooks/useGetChannels';
 import { useGetPipelines } from '@/pipelines/hooks/useGetPipelines';
 import { TICKET_LIST_CHANGED } from '@/ticket/graphql/subscriptions/ticketListChanged';
@@ -7,7 +8,6 @@ import {
   cn,
   Collapsible,
   Empty,
-  IconComponent,
   NavigationMenuGroup,
   Sidebar,
   Skeleton,
@@ -55,7 +55,7 @@ function ChannelItem({ channel, pipelineId }: Readonly<ChannelItemProps>) {
           }`}
         >
           {!!channel.icon && (
-            <IconComponent
+            <ChannelIcon
               name={channel.icon}
               className={cn(
                 'flex-none text-accent-foreground',

@@ -28,7 +28,6 @@ import {
   Combobox,
   DropdownMenu,
   PopoverScoped,
-  Separator,
   Skeleton,
   Tooltip,
   cn,
@@ -40,6 +39,8 @@ import { CustomersInline, SelectMember, TagsSelect } from 'ui-modules';
 import { ConversationActions } from '@/inbox/conversations/conversation-detail/components/ConversationActions';
 import { ConversationConvert } from '@/inbox/conversations/conversation-detail/components/convert/ConversationConvert';
 import { useTranslation } from 'react-i18next';
+import { ChannelIcon } from '@/inbox/channel/components/ChannelIcon';
+import { Badge } from 'erxes-ui';
 import { type SyntheticEvent, useState } from 'react';
 
 const stopEventPropagation = (event: SyntheticEvent) => {
@@ -114,7 +115,7 @@ const ConversationHeaderProfile = () => {
     <CustomersInline
       customers={customer ? [customer] : undefined}
       customerIds={customerId ? [customerId] : undefined}
-      className="text-sm text-foreground flex-none"
+      className="text-sm font-semibold text-foreground flex-none"
       placeholder="anonymous customer"
     />
   );
@@ -389,8 +390,37 @@ const ConversationActionsDropdown = ({
   );
 };
 
+const ConversationQueueChip = () => {
+  const { integration } = useConversationContext();
+  const channel = integration?.channel;
+  if (!channel?.name) return null;
+  return (
+    <span
+      className="flex h-6 max-w-40 flex-none items-center gap-1 rounded bg-primary/10 px-2 text-xs font-medium text-primary"
+      title={channel.name}
+    >
+      <ChannelIcon name={channel.icon} className="size-3 flex-none" />
+      <span className="truncate">{channel.name}</span>
+    </span>
+  );
+};
+
+const ConversationStatusBadge = () => {
+  const { t } = useTranslation('frontline');
+  const { status } = useConversationContext();
+  const isClosed = status === ConversationStatus.CLOSED;
+  return (
+    <Badge
+      variant={isClosed ? 'secondary' : 'success'}
+      className="flex-none text-xs"
+    >
+      {isClosed ? t('resolved', 'Resolved') : t('open', 'Open')}
+    </Badge>
+  );
+};
+
 export const ConversationHeader = () => {
-  const { loading } = useConversationContext();
+  const { loading, _id, status, integration } = useConversationContext();
   const [, setConversationId] = useQueryState<string>('conversationId');
   const view = useInboxLayout();
   const {
@@ -399,41 +429,65 @@ export const ConversationHeader = () => {
     compactLevel,
   } = useOverflowCompact<HTMLDivElement>();
   const hideAssignee = compactLevel === 2;
+  const isClosed = status === ConversationStatus.CLOSED;
 
   return (
     <div
-      ref={headerRef}
-      className="h-11 flex items-center px-5 text-xs font-medium text-accent-foreground flex-none gap-3 whitespace-nowrap overflow-hidden"
+      className={cn(
+        'flex flex-none flex-col border-l-4',
+        isClosed ? 'border-l-muted-foreground/40' : 'border-l-success',
+      )}
     >
-      {view === 'list' ? (
-        <Button
-          variant="secondary"
-          size="icon"
-          className="[&>svg]:size-4 text-foreground flex-none"
-          onClick={() => setConversationId(null)}
-        >
-          <IconArrowLeft />
-        </Button>
-      ) : (
-        <ConversationListToggle />
-      )}
-      {!loading ? (
-        <ConversationHeaderProfile />
-      ) : (
-        <Skeleton className="w-32 h-4 ml-2" />
-      )}
-      <Separator.Inline />
-      {!hideAssignee && <AssignConversation />}
-      <AutomatedReplyStatusBadge />
-      <div className="ml-auto flex min-w-0 items-center gap-3">
-        {!isCompact && <ConversationTags />}
-        <IntegrationActions />
-        <ConversationConvert />
-        {isCompact ? (
-          <ConversationActionsDropdown showAssignee={hideAssignee} />
+      <div
+        ref={headerRef}
+        className="h-12 flex items-center px-4 text-xs font-medium text-accent-foreground flex-none gap-3 whitespace-nowrap overflow-hidden"
+      >
+        {view === 'list' ? (
+          <Button
+            variant="secondary"
+            size="icon"
+            className="[&>svg]:size-4 text-foreground flex-none"
+            onClick={() => setConversationId(null)}
+          >
+            <IconArrowLeft />
+          </Button>
         ) : (
-          <ConversationActions />
+          <ConversationListToggle />
         )}
+        {integration?.channel && (
+          <ChannelIcon
+            name={integration.channel.icon}
+            className="size-4 flex-none text-muted-foreground"
+          />
+        )}
+        {!loading ? (
+          <ConversationHeaderProfile />
+        ) : (
+          <Skeleton className="w-32 h-4 ml-2" />
+        )}
+        {_id && (
+          <span className="flex-none text-xs text-muted-foreground tabular-nums">
+            #{_id.slice(-6)}
+          </span>
+        )}
+        <AutomatedReplyStatusBadge />
+        <div className="ml-auto flex min-w-0 items-center gap-2">
+          {!hideAssignee && <AssignConversation />}
+          {!isCompact && <ConversationQueueChip />}
+          <ConversationStatusBadge />
+        </div>
+      </div>
+      <div className="flex h-10 items-center gap-2 overflow-hidden whitespace-nowrap border-t border-border/60 px-4">
+        {!isCompact && <ConversationTags />}
+        <div className="ml-auto flex min-w-0 items-center gap-2">
+          <IntegrationActions />
+          <ConversationConvert />
+          {isCompact ? (
+            <ConversationActionsDropdown showAssignee={hideAssignee} />
+          ) : (
+            <ConversationActions />
+          )}
+        </div>
       </div>
     </div>
   );

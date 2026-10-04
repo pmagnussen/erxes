@@ -1,7 +1,8 @@
 import { SideMenu, cn, useSideMenuContext } from 'erxes-ui';
 import { RefObject, useEffect, useRef } from 'react';
 import { getRelationWidgetLabel, useRelationWidget } from 'ui-modules';
-import { IconHierarchy2 } from '@tabler/icons-react';
+import { IconHierarchy2, IconUser } from '@tabler/icons-react';
+import { ConversationCustomerPanel } from './ConversationCustomerPanel';
 import { useTranslation } from 'react-i18next';
 import { ConversationProperties } from './ConversationProperties';
 
@@ -75,7 +76,11 @@ export const ConversationSideWidget = ({
   const sideMenuRef = useRef<HTMLDivElement>(null);
 
   return (
-    <SideMenu ref={sideMenuRef} className="flex-none">
+    <SideMenu
+      ref={sideMenuRef}
+      className="flex-none"
+      defaultValue={asSheet ? undefined : 'customer'}
+    >
       {asSheet && (
         <SideWidgetOutsideClose
           containerRef={sideMenuRef}
@@ -102,6 +107,17 @@ export const ConversationSideWidget = ({
       })}
 
       <SideMenu.Content
+        value="customer"
+        className={cn(sideMenuContentClass(asSheet), 'overflow-hidden')}
+      >
+        <ConversationCustomerPanel
+          customerId={customerId}
+          _id={_id}
+          propertiesData={propertiesData}
+        />
+      </SideMenu.Content>
+
+      <SideMenu.Content
         value="properties"
         className={cn(sideMenuContentClass(asSheet), 'overflow-y-auto p-4')}
       >
@@ -109,6 +125,11 @@ export const ConversationSideWidget = ({
       </SideMenu.Content>
 
       <SideMenu.Sidebar>
+        <SideMenu.Trigger
+          value="customer"
+          label={t('customer-info', 'Customer info')}
+          Icon={IconUser}
+        />
         {relationWidgetsModules.map((module) => {
           return (
             <SideMenu.Trigger

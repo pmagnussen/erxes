@@ -28,7 +28,7 @@ export const ConversationActions = () => {
   return (
     <Toggle
       variant="outline"
-      className="flex-none"
+      className="flex-none data-[state=off]:border-primary data-[state=off]:bg-primary data-[state=off]:text-primary-foreground data-[state=off]:hover:bg-primary/90"
       pressed={status === ConversationStatus.CLOSED}
       onPressedChange={handleChangeConversationStatus}
       disabled={loading}

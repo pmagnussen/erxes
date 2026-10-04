@@ -1,10 +1,10 @@
+import { ChannelIcon } from '@/inbox/channel/components/ChannelIcon';
 import { useGetChannels } from '@/channels/hooks/useGetChannels';
 import { useGetPipelines } from '@/pipelines/hooks/useGetPipelines';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   Collapsible,
-  IconComponent,
   NavigationMenuGroup,
   NavigationMenuLinkItem,
   Sidebar,
@@ -40,7 +40,7 @@ function ChannelItem({ channel }: ChannelItemProps) {
                 className="px-2 flex min-w-0 justify-start"
                 disabled={channel.pipelineCount === 0}
               >
-                <IconComponent
+                <ChannelIcon
                   name={channel.icon}
                   className="text-accent-foreground shrink-0"
                 />

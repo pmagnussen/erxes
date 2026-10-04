@@ -1,6 +1,6 @@
+import { ChannelIcon } from '@/inbox/channel/components/ChannelIcon';
 import {
   Button,
-  IconComponent,
   NavigationMenuGroup,
   Skeleton,
   TextOverflowTooltip,
@@ -189,7 +189,7 @@ const TeamChannelItem = ({
     <ChannelNavItem
       name={channel.name}
       icon={
-        <IconComponent
+        <ChannelIcon
           name={channel.icon}
           className="size-3.5 text-accent-foreground shrink-0"
         />

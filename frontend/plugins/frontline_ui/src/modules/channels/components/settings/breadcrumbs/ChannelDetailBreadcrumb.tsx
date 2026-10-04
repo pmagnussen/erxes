@@ -1,9 +1,10 @@
+import { ChannelIcon } from '@/inbox/channel/components/ChannelIcon';
 import { useGetChannel } from '@/channels/hooks/useGetChannel';
 import {
   FACEBOOK_AUTH_SUCCESS_MESSAGE,
   INSTAGRAM_AUTH_SUCCESS_MESSAGE,
 } from '@/integrations/constants/authMessages';
-import { Button, IconComponent, Skeleton } from 'erxes-ui';
+import { Button, Skeleton } from 'erxes-ui';
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
@@ -38,7 +39,7 @@ export const ChannelDetailBreadcrumb = ({
   return (
     <Link to={`/settings/frontline/channels/${channelId || id}`}>
       <Button variant="ghost" className="font-semibold">
-        <IconComponent
+        <ChannelIcon
           name={channel?.icon}
           className="w-4 h-4 text-accent-foreground"
         />

@@ -1,3 +1,4 @@
+import { ChannelIcon } from '@/inbox/channel/components/ChannelIcon';
 import {
   Avatar,
   Badge,
@@ -5,7 +6,6 @@ import {
   Button,
   Checkbox,
   cn,
-  IconComponent,
   RelativeDateDisplay,
   Skeleton,
   useMultiQueryState,
@@ -104,7 +104,7 @@ export const ConversationItem = ({
               </div>
               <div className="w-auto text-left flex-none truncate flex items-center gap-1 text-xs">
                 {channel && (
-                  <IconComponent name={channel?.icon} className="size-3" />
+                  <ChannelIcon name={channel?.icon} className="size-3" />
                 )}
                 {channel && <span title={channel.name}>{channel.name}</span>}
               </div>
@@ -166,7 +166,7 @@ export const ConversationItem = ({
                 <span>·</span>
                 <span className="flex items-center gap-1 truncate" title={channel.name}>
                   {t('in', 'in')}
-                  <IconComponent name={channel.icon} className="size-3" />
+                  <ChannelIcon name={channel.icon} className="size-3" />
                   {channel.name}
                 </span>
               </>
@@ -190,7 +190,7 @@ export const ConversationItem = ({
             </MembersInline.Provider>
           ) : (
             <Avatar size="sm">
-              <Avatar.Fallback className="text-muted-foreground">?</Avatar.Fallback>
+              <Avatar.Fallback className="border border-dashed border-muted-foreground/60 bg-muted font-semibold text-foreground">?</Avatar.Fallback>
             </Avatar>
           )}
           <Badge
