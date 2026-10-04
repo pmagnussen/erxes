@@ -253,6 +253,45 @@ export const GET_SETTINGS_PATH_DATA = (version?: boolean, t?: TFunction) => {
   };
 };
 
+export type TSettingsGroupKey = 'general' | 'channels' | 'manage' | 'other';
+
+/**
+ * Dixa-style grouping of the workspace settings entries. Paths not listed
+ * here fall back to the "other" group so nothing disappears.
+ */
+export const SETTINGS_GROUP_BY_PATH: Record<string, TSettingsGroupKey> = {
+  [SettingsWorkspacePath.General]: 'general',
+  [SettingsWorkspacePath.TeamMember]: 'general',
+  [SettingsWorkspacePath.Structure]: 'general',
+  [SettingsWorkspacePath.Brands]: 'general',
+  [SettingsWorkspacePath.MailConfig]: 'channels',
+  [SettingsWorkspacePath.MessagePro]: 'channels',
+  [SettingsWorkspacePath.Tags]: 'manage',
+  [SettingsWorkspacePath.EmailTemplates]: 'manage',
+  [SettingsWorkspacePath.Properties]: 'manage',
+  [SettingsWorkspacePath.Automations]: 'manage',
+  [SettingsWorkspacePath.Products]: 'manage',
+  [SettingsWorkspacePath.FileUpload]: 'manage',
+};
+
+/** Plugins whose settings navigation belongs under "Channels & Routing". */
+export const CHANNEL_SETTINGS_PLUGINS = ['frontline'];
+
+export const groupSettingsNav = <T extends { path: string }>(
+  items: T[],
+): Record<TSettingsGroupKey, T[]> => {
+  const groups: Record<TSettingsGroupKey, T[]> = {
+    general: [],
+    channels: [],
+    manage: [],
+    other: [],
+  };
+  for (const item of items) {
+    groups[SETTINGS_GROUP_BY_PATH[item.path] ?? 'other'].push(item);
+  }
+  return groups;
+};
+
 export const SETTINGS_PERMISSION_MAP: Record<string, string> = {
   [SettingsWorkspacePath.TeamMember]: 'teamMembers',
   [SettingsWorkspacePath.Structure]: 'organization',

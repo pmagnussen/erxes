@@ -1,3 +1,4 @@
+import { workloadLimitsMutations } from '@/inbox/graphql/resolvers/workloadLimits';
 import { channelMutations } from '@/channel/graphql/resolvers/mutations/channel';
 import { conversationMutations } from '@/inbox/graphql/resolvers/mutations/conversations';
 import { integrationMutations } from '@/inbox/graphql/resolvers/mutations/integrations';
@@ -27,6 +28,7 @@ import ticketMutations from '~/modules/ticket/graphql/resolvers/mutations';
 export const mutations = {
   ...channelMutations,
   ...conversationMutations,
+  ...workloadLimitsMutations,
   ...integrationMutations,
   ...cpInboxMutations,
   ...facebookMutations,

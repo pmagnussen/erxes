@@ -1,4 +1,5 @@
 import {
+  IconGauge,
   IconInbox,
   IconPlugConnected,
   IconUserCircle,
@@ -8,33 +9,42 @@ import { SettingsNavigationMenuLinkItem, Sidebar } from 'erxes-ui';
 import { Can } from 'ui-modules';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Rendered by core-ui inside the Dixa-style "Channels & Routing" group, so
+ * frontline items lead that group: Queues (channels) first.
+ */
 export const FrontlineSettingsNavigation = () => {
   const { t } = useTranslation('frontline');
   return (
     <Sidebar.Group>
-      <Sidebar.GroupLabel className="h-4">
-        {t('frontline', 'Frontline')}
+      <Sidebar.GroupLabel className="h-4 text-[10px] font-semibold uppercase tracking-wider">
+        {t('channels-and-routing', 'Channels & Routing')}
       </Sidebar.GroupLabel>
       <Sidebar.GroupContent className="pt-1">
         <Sidebar.Menu>
           <SettingsNavigationMenuLinkItem
             pathPrefix={FrontlinePaths.Frontline}
             path={FrontlinePaths.Channels}
-            name="Channels"
+            name={t('queues', 'Queues')}
             icon={IconInbox}
           />
-
+          <SettingsNavigationMenuLinkItem
+            pathPrefix={FrontlinePaths.Frontline}
+            path={FrontlinePaths.WorkloadLimits}
+            name={t('workload-limits', 'Workload limits')}
+            icon={IconGauge}
+          />
           <SettingsNavigationMenuLinkItem
             pathPrefix={FrontlinePaths.Frontline}
             path={FrontlinePaths.PersonalChannel}
-            name="Personal channel"
+            name={t('personal-channel', 'Personal channel')}
             icon={IconUserCircle}
           />
           <Can action="integrationsEdit">
             <SettingsNavigationMenuLinkItem
               pathPrefix={FrontlinePaths.Frontline}
               path={FrontlinePaths.IntegrationConfig}
-              name="Integrations Config"
+              name={t('integrations-config', 'Integrations config')}
               icon={IconPlugConnected}
             />
           </Can>

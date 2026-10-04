@@ -1,3 +1,4 @@
+import { workloadLimitsQueries } from '@/inbox/graphql/resolvers/workloadLimits';
 import { teamBoardQueries } from '@/inbox/graphql/resolvers/queries/teamBoard';
 import { channelQueries } from '@/channel/graphql/resolvers/queries/channel';
 import { conversationQueries } from '@/inbox/graphql/resolvers/queries/conversations';
@@ -29,6 +30,7 @@ export const queries = {
   ...channelQueries,
   ...conversationQueries,
   ...teamBoardQueries,
+  ...workloadLimitsQueries,
   ...integrationQueries,
   ...cpInboxQueries,
   ...facebookQueries,

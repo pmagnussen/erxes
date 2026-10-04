@@ -15,6 +15,11 @@ import {
   queries as TeamBoardQueries,
   types as TeamBoardTypes,
 } from '@/inbox/graphql/schemas/teamBoard';
+import {
+  mutations as WorkloadLimitsMutations,
+  queries as WorkloadLimitsQueries,
+  types as WorkloadLimitsTypes,
+} from '@/inbox/graphql/schemas/workloadLimits';
 
 import {
   mutations as IntegrationsMutations,
@@ -147,6 +152,7 @@ export const types = `
     ${ChannelsTypes}
     ${ConversationsTypes}
     ${TeamBoardTypes}
+    ${WorkloadLimitsTypes}
     ${IntegrationsTypes}
     ${FacebookTypes}
     ${DiscordTypes}
@@ -174,6 +180,7 @@ export const queries = `
     ${ChannelsQueries}
     ${ConversationsQueries}
     ${TeamBoardQueries}
+    ${WorkloadLimitsQueries}
     ${IntegrationsQueries}
     ${FacebookQueries}
     ${DiscordQueries}
@@ -201,6 +208,7 @@ export const queries = `
 export const mutations = `
    ${ChannelsMutations}
    ${ConversationsMutations}
+   ${WorkloadLimitsMutations}
    ${IntegrationsMutations}
    ${FacebookMutations}
    ${DiscordMutations}

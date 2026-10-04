@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router-dom';
 import { BUCKET_ICONS, BUCKET_ORDER } from '@/team-board/components/BucketIcon';
 import { useQueueBoard, useTeamBoard } from '@/team-board/hooks/useTeamBoard';
 import { ITeamBoardAgent, TBoardStatus } from '@/team-board/types/teamBoard';
+import { useWorkloadLimits } from '@/workload-limits/hooks/useWorkloadLimits';
+import { IWorkloadLimits } from '@/workload-limits/types/workloadLimits';
 
 const ALL = 'all';
 
@@ -34,7 +36,13 @@ const useStatusLabels = (): Record<TBoardStatus, string> => {
   };
 };
 
-const AgentRow = ({ agent }: { agent: ITeamBoardAgent }) => {
+const AgentRow = ({
+  agent,
+  limits,
+}: {
+  agent: ITeamBoardAgent;
+  limits: IWorkloadLimits;
+}) => {
   const navigate = useNavigate();
   const labels = useStatusLabels();
   const name = agent.fullName || agent.email || agent._id;
@@ -67,17 +75,22 @@ const AgentRow = ({ agent }: { agent: ITeamBoardAgent }) => {
         {BUCKET_ORDER.map((bucket) => {
           const Icon = BUCKET_ICONS[bucket];
           const value = agent.counts?.[bucket] ?? 0;
+          const limit = limits[bucket];
+          const hasLimit = limit !== null && limit !== undefined;
+          const atLimit = hasLimit && value >= limit;
           return (
             <span
               key={bucket}
-              title={bucket}
+              title={hasLimit ? `${bucket}: ${value}/${limit}` : bucket}
               className={cn(
-                'flex w-10 items-center gap-1 text-sm tabular-nums',
+                'flex items-center gap-1 text-sm tabular-nums',
+                hasLimit ? 'w-14' : 'w-10',
                 value ? 'text-foreground' : 'text-muted-foreground/50',
+                atLimit && 'text-destructive font-semibold',
               )}
             >
               <Icon className="size-4" />
-              {value}
+              {hasLimit ? `${value}/${limit}` : value}
             </span>
           );
         })}
@@ -95,6 +108,7 @@ export const TeamBoard = () => {
   const [status, setStatus] = useState<string>(ALL);
   const [channelId, setChannelId] = useState<string>(ALL);
   const [search, setSearch] = useState('');
+  const { limits } = useWorkloadLimits();
   const { agents, loading, error } = useTeamBoard(
     channelId === ALL ? undefined : channelId,
   );
@@ -183,7 +197,7 @@ export const TeamBoard = () => {
                 {labels[group.key]} ({group.agents.length})
               </h3>
               {group.agents.map((agent) => (
-                <AgentRow key={agent._id} agent={agent} />
+                <AgentRow key={agent._id} agent={agent} limits={limits} />
               ))}
             </section>
           ))

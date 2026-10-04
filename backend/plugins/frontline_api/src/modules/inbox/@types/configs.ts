@@ -46,10 +46,7 @@ export const loadConfigClass = (models: IModels) => {
     public static async createOrUpdateConfig({
       code,
       value,
-    }: {
-      code: string;
-      value: string[];
-    }) {
+    }: IConfig) {
       const obj = await models.Configs.findOne({ code });
 
       if (obj) {

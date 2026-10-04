@@ -101,7 +101,16 @@
     "exit-settings": "Тохиргооноос гарах",
     "approval-requests": "Зөвшөөрлийн хүсэлтүүд",
     "favorites": "Дуртай",
-    "my-inbox": "Миний инбокс"
+    "my-inbox": "Миний инбокс",
+    "settings-general": "Ерөнхий",
+    "settings-channels-routing": "Суваг ба чиглүүлэлт",
+    "settings-channels-more": "Сувгийн тохиргоо",
+    "settings-manage": "Удирдах",
+    "settings-other-plugins": "Бусад плагин",
+    "settings-about": "Тухай",
+    "settings-version": "Хувилбар",
+    "settings-os": "erxes OS",
+    "settings-saas": "erxes"
   },
   "plugin": {
     "_": "Плагин",

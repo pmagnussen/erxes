@@ -100,7 +100,16 @@
     "exit-settings": "Exit Settings",
     "approval-requests": "Approval Requests",
     "favorites": "Favorites",
-    "my-inbox": "My inbox"
+    "my-inbox": "My inbox",
+    "settings-general": "General",
+    "settings-channels-routing": "Channels & Routing",
+    "settings-channels-more": "Channel settings",
+    "settings-manage": "Manage",
+    "settings-other-plugins": "Other plugins",
+    "settings-about": "About",
+    "settings-version": "Version",
+    "settings-os": "erxes OS",
+    "settings-saas": "erxes"
   },
   "plugin": {
     "_": "Plugin",

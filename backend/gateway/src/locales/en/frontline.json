@@ -1805,5 +1805,18 @@
   "queue-board-error": "Could not load queues",
   "no-queues": "No queues found",
   "longest-waiting": "Longest waiting",
-  "agents-online": "Agents online"
+  "agents-online": "Agents online",
+  "channels-and-routing": "Channels & Routing",
+  "workload-limits": "Workload limits",
+  "agent-workload-limits": "Agent workload limits",
+  "workload-limits-description": "Maximum open conversations per agent for each channel. Leave empty for unlimited.",
+  "workload-limits-invalid": "Limits must be whole numbers of zero or more.",
+  "workload-limits-saved": "Workload limits saved",
+  "unlimited": "Unlimited",
+  "integrations-config": "Integrations config",
+  "bucket-call": "Call",
+  "bucket-email": "Email",
+  "bucket-chat": "Chat",
+  "bucket-messenger": "Messenger",
+  "bucket-other": "Other"
 }

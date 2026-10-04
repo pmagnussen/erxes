@@ -1796,3 +1796,7 @@ status })` returns the leaving side as `canMoveTicket` (what disables the
   open a Call Pro conversation — the recording plays, and a conversation with
   several candidates shows the picker until a customer is chosen, after which
   the picker is replaced by the confirm/switch control without a reload.
+
+## Settings navigation and workload limits (vera-ui)
+- `FrontlineSettingsNavigation` renders the Dixa-style "Channels & Routing" group (core-ui places it after General): Queues (channels), Workload limits, Personal channel, Integrations config.
+- `modules/workload-limits/`: settings page at `/settings/frontline/workload-limits`; ops `FrontlineWorkloadLimits` / `FrontlineWorkloadLimitsUpdate` (cache updated via `writeQuery`). Team overview shows `count/limit` per bucket, red at or over the limit. Display only: assignment is not blocked.

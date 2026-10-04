@@ -5,6 +5,8 @@ import { SettingsHeader } from 'ui-modules';
 import { PersonalChannelBreadcrumb } from '@/channels/components/settings/personal-channel/PersonalChannelBreadcrumb';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { usePermissionCheck } from 'ui-modules';
+import { WorkloadLimitsBreadcrumb } from '@/workload-limits/components/WorkloadLimitsBreadcrumb';
+import { WorkloadLimitsSettings } from '@/workload-limits/components/WorkloadLimitsSettings';
 
 const ConfigsSettings = lazy(() => import('@/integrations-config/Settings'));
 
@@ -56,6 +58,15 @@ const FrontlineSettings = () => {
             <PageContainer>
               <SettingsHeader breadcrumbs={<PersonalChannelBreadcrumb />} />
               <PersonalChannelPage />
+            </PageContainer>
+          }
+        />
+        <Route
+          path={FrontlinePaths.WorkloadLimits}
+          element={
+            <PageContainer>
+              <SettingsHeader breadcrumbs={<WorkloadLimitsBreadcrumb />} />
+              <WorkloadLimitsSettings />
             </PageContainer>
           }
         />

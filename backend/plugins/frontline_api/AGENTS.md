@@ -1169,3 +1169,7 @@ customerIds, tagIds, propertiesData: JSON)` — the public messenger ticket
   rejection throws instead of silently keeping the unvalidated input, and
   clearing every property to `{}` stays `{}` on the next read rather than
   reverting to any legacy value.
+
+## Workload limits
+- Stored in `models.Configs` under code `FRONTLINE_WORKLOAD_LIMITS` as `{ email, chat, messenger, call, other }` (null = unlimited). `normalizeWorkloadLimits` (`modules/inbox/workloadLimits.ts`) validates non-negative integers.
+- GraphQL: `frontlineWorkloadLimits` query, `frontlineWorkloadLimitsUpdate(limits)` mutation (logged-in users). Not enforced on assignment.

@@ -1805,5 +1805,18 @@
   "queue-board-error": "Could not load queues",
   "no-queues": "No queues found",
   "longest-waiting": "Longest waiting",
-  "agents-online": "Agents online"
+  "agents-online": "Agents online",
+  "channels-and-routing": "Суваг ба чиглүүлэлт",
+  "workload-limits": "Ачааллын хязгаар",
+  "agent-workload-limits": "Ажилтны ачааллын хязгаар",
+  "workload-limits-description": "Суваг тус бүрээр ажилтанд ногдох нээлттэй харилцааны дээд тоо. Хоосон бол хязгааргүй.",
+  "workload-limits-invalid": "Хязгаар нь 0 буюу түүнээс их бүхэл тоо байна.",
+  "workload-limits-saved": "Ачааллын хязгаар хадгалагдлаа",
+  "unlimited": "Хязгааргүй",
+  "integrations-config": "Интеграцийн тохиргоо",
+  "bucket-call": "Дуудлага",
+  "bucket-email": "Имэйл",
+  "bucket-chat": "Чат",
+  "bucket-messenger": "Мессенжер",
+  "bucket-other": "Бусад"
 }

@@ -9,9 +9,12 @@ import { useNavigate } from 'react-router-dom';
 import { pluginsConfigState, useVersion, usePermissionCheck } from 'ui-modules';
 import { GET_CORE_MODULES } from '~/plugins/constants/core-plugins.constants';
 import {
+  CHANNEL_SETTINGS_PLUGINS,
   GET_SETTINGS_PATH_DATA,
+  groupSettingsNav,
   SETTINGS_PERMISSION_MAP,
 } from '../constants/data';
+import { TSettingPath } from '@/types/paths/SettingsPath';
 
 export function SettingsSidebar({
   hideExit = false,
@@ -55,42 +58,47 @@ export function SettingsSidebar({
     return hasModulePermission(item.path);
   });
 
+  const grouped = groupSettingsNav(filteredNav);
+  const channelPlugins = pluginsWithSettingsNavigations.filter(({ name }) =>
+    CHANNEL_SETTINGS_PLUGINS.includes(name),
+  );
+  const otherPlugins = pluginsWithSettingsNavigations.filter(
+    ({ name }) => !CHANNEL_SETTINGS_PLUGINS.includes(name),
+  );
+
+  const renderItems = (items: TSettingPath[]) =>
+    items.map((item) => (
+      <NavigationMenuLinkItem
+        key={item.path}
+        pathPrefix={AppPath.Settings}
+        path={item.path}
+        name={item.name}
+        icon={item.icon}
+      />
+    ));
+
   return (
-    <Sidebar.Content className="styled-scroll gap-2">
+    <Sidebar.Content className="styled-scroll gap-1 [&_[data-active=true]]:rounded-full [&_[data-active=true]]:bg-primary/10 [&_[data-active=true]]:text-primary">
       {!hideExit && <SettingsExitButton />}
-      <SettingsNavigationGroup name={t('account')}>
-        {sidebar.account.map((item) => (
-          <NavigationMenuLinkItem
-            key={item.name}
-            pathPrefix={AppPath.Settings}
-            path={item.path}
-            name={item.name}
-            icon={item.icon}
-          />
-        ))}
-      </SettingsNavigationGroup>
-      <SettingsNavigationGroup name={t('workspace')}>
-        {filteredNav.map((item) => (
-          <NavigationMenuLinkItem
-            pathPrefix={AppPath.Settings}
-            path={item.path}
-            name={item.name}
-            icon={item.icon}
-            key={item.name}
-          />
-        ))}
+      <SettingsNavigationGroup name={t('settings-general', 'General')}>
+        {renderItems([...sidebar.account, ...grouped.general])}
       </SettingsNavigationGroup>
 
-      <SettingsNavigationGroup name={t('developer')}>
-        {filteredDeveloper.map((item) => (
-          <NavigationMenuLinkItem
-            pathPrefix={AppPath.Settings}
-            path={item.path}
-            name={item.name}
-            icon={item.icon}
-            key={item.name}
-          />
-        ))}
+      {channelPlugins.map(
+        ({ Navigation, name }) => Navigation && <Navigation key={name} />,
+      )}
+      <SettingsNavigationGroup
+        name={
+          channelPlugins.length
+            ? t('settings-channels-more', 'Channel settings')
+            : t('settings-channels-routing', 'Channels & Routing')
+        }
+      >
+        {renderItems(grouped.channels)}
+      </SettingsNavigationGroup>
+
+      <SettingsNavigationGroup name={t('settings-manage', 'Manage')}>
+        {renderItems([...grouped.manage, ...grouped.other])}
       </SettingsNavigationGroup>
 
       <SettingsNavigationGroup name={t('core-modules')}>
@@ -105,10 +113,36 @@ export function SettingsSidebar({
         ))}
       </SettingsNavigationGroup>
 
-      {pluginsWithSettingsNavigations.map(
-        ({ Navigation, name }) => Navigation && <Navigation key={name} />,
+      {otherPlugins.length > 0 && (
+        <div className="flex flex-col gap-1">
+          <SettingsGroupHeading
+            name={t('settings-other-plugins', 'Other plugins')}
+          />
+          {otherPlugins.map(
+            ({ Navigation, name }) => Navigation && <Navigation key={name} />,
+          )}
+        </div>
       )}
+
+      <SettingsNavigationGroup name={t('developer')}>
+        {renderItems(filteredDeveloper)}
+      </SettingsNavigationGroup>
+
+      <SettingsNavigationGroup name={t('settings-about', 'About')}>
+        <li className="px-2 py-1 text-xs text-muted-foreground">
+          {t('settings-version', 'Version')}:{' '}
+          {version ? t('settings-os', 'erxes OS') : t('settings-saas', 'erxes')}
+        </li>
+      </SettingsNavigationGroup>
     </Sidebar.Content>
+  );
+}
+
+function SettingsGroupHeading({ name }: Readonly<{ name: string }>) {
+  return (
+    <div className="px-4 pt-3 text-[10px] font-semibold uppercase tracking-wider text-primary/80">
+      {name}
+    </div>
   );
 }
 
@@ -123,7 +157,9 @@ export function SettingsNavigationGroup({
 
   return (
     <Sidebar.Group>
-      <Sidebar.GroupLabel className="h-4">{name}</Sidebar.GroupLabel>
+      <Sidebar.GroupLabel className="h-4 text-[10px] font-semibold uppercase tracking-wider text-primary/80">
+        {name}
+      </Sidebar.GroupLabel>
       <Sidebar.GroupContent className="pt-1">
         <Sidebar.Menu>{children}</Sidebar.Menu>
       </Sidebar.GroupContent>

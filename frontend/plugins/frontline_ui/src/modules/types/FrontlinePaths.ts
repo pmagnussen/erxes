@@ -7,6 +7,7 @@ export enum FrontlinePaths {
   ErxesMessengerPreview = '/erxes-messenger-preview',
   Channels = '/channels',
   PersonalChannel = '/personal-channel',
+  WorkloadLimits = '/workload-limits',
   ChannelsCatchAll = '/channels/*',
   ChannelDetails = '/:id',
   ChannelMembers = '/:id/members',
