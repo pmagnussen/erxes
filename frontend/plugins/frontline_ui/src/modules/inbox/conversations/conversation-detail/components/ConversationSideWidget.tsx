@@ -79,7 +79,7 @@ export const ConversationSideWidget = ({
     <SideMenu
       ref={sideMenuRef}
       className="flex-none"
-      defaultValue={asSheet ? undefined : 'customer'}
+      defaultValue={asSheet ? undefined : 'customer-info'}
     >
       {asSheet && (
         <SideWidgetOutsideClose
@@ -107,7 +107,7 @@ export const ConversationSideWidget = ({
       })}
 
       <SideMenu.Content
-        value="customer"
+        value="customer-info"
         className={cn(sideMenuContentClass(asSheet), 'overflow-hidden')}
       >
         <ConversationCustomerPanel
@@ -126,7 +126,7 @@ export const ConversationSideWidget = ({
 
       <SideMenu.Sidebar>
         <SideMenu.Trigger
-          value="customer"
+          value="customer-info"
           label={t('customer-info', 'Customer info')}
           Icon={IconUser}
         />
