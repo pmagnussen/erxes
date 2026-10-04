@@ -2,6 +2,7 @@ import { INavigationActivity } from '@/navigation/types/NavigationActivity';
 import {
   getPromotedNavigationRank,
   isPromotedNavigationActivity,
+  NAVIGATION_SEARCH_RANK,
   splitPromotedNavigationActivities,
 } from '@/navigation/utils/promotedNavigationActivities';
 
@@ -17,10 +18,13 @@ const activity = (
 });
 
 describe('promoted navigation activities', () => {
-  it('ranks Command before AI Agent', () => {
-    expect(getPromotedNavigationRank(activity('cf-os'))).toBe(0);
-    expect(getPromotedNavigationRank(activity('erxes-agent'))).toBe(1);
-    expect(getPromotedNavigationRank(activity('/cf-os/'))).toBe(0);
+  it('ranks Conversations, Contacts, Command, then AI Agent', () => {
+    expect(getPromotedNavigationRank(activity('frontline/inbox'))).toBe(0);
+    expect(getPromotedNavigationRank(activity('contacts'))).toBe(1);
+    expect(getPromotedNavigationRank(activity('cf-os'))).toBe(2);
+    expect(getPromotedNavigationRank(activity('erxes-agent'))).toBe(3);
+    expect(getPromotedNavigationRank(activity('/cf-os/'))).toBe(2);
+    expect(NAVIGATION_SEARCH_RANK).toBe(2);
   });
 
   it('leaves other plugins unpromoted', () => {
@@ -41,6 +45,20 @@ describe('promoted navigation activities', () => {
     ).toEqual({
       promoted: [command, agent],
       rest: [sales, operation],
+    });
+  });
+
+  it('puts Conversations and Contacts first in Dixa order', () => {
+    const contacts = activity('contacts', 'core:contacts');
+    const frontline = activity('frontline/inbox', 'frontline');
+    const command = activity('cf-os', 'command');
+    const sales = activity('sales');
+
+    expect(
+      splitPromotedNavigationActivities([command, contacts, sales, frontline]),
+    ).toEqual({
+      promoted: [frontline, contacts, command],
+      rest: [sales],
     });
   });
 

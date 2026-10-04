@@ -19,7 +19,7 @@ export const NavigationRailLogo = ({ expanded }: { expanded: boolean }) => {
         <Button
           asChild
           className={cn(
-            'shrink-0 font-semibold',
+            'shrink-0 font-semibold text-rail-foreground hover:bg-white/10 hover:text-rail-foreground',
             expanded
               ? 'h-10 min-w-0 flex-1 justify-start px-2 text-base'
               : 'mx-auto size-8 justify-center px-0',
@@ -28,7 +28,7 @@ export const NavigationRailLogo = ({ expanded }: { expanded: boolean }) => {
         >
           <Link aria-label={companyName} to={AppPath.Index}>
             <span className="flex size-5 shrink-0 items-center justify-center [&>img]:size-5! [&>svg]:size-5!">
-              <OrgLogoIcon className="text-primary" />
+              <OrgLogoIcon className="text-rail-foreground" />
             </span>
             {expanded && <span className="truncate">{companyName}</span>}
           </Link>
@@ -38,9 +38,10 @@ export const NavigationRailLogo = ({ expanded }: { expanded: boolean }) => {
         <Sidebar.Trigger
           aria-label={t('toggle-panel')}
           className={
-            expanded
-              ? 'size-8 shrink-0 rounded-md'
-              : 'mx-auto size-8 shrink-0 rounded-md'
+            cn(
+              'size-8 shrink-0 rounded text-rail-foreground hover:bg-white/10 hover:text-rail-foreground',
+              !expanded && 'mx-auto',
+            )
           }
           title={t('toggle-panel')}
         />

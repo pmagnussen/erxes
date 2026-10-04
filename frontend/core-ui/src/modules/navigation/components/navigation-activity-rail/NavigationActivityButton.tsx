@@ -29,22 +29,19 @@ export const NavigationActivityButton = ({
       <Button
         aria-label={activity.label}
         className={cn(
-          'relative h-7 min-w-0 shrink-0 justify-start gap-2 rounded-md text-sm transition-[width,margin,padding] duration-200 ease-linear [&>svg]:size-4!',
+          'relative h-7 min-w-0 shrink-0 justify-start gap-2 rounded text-sm text-rail-foreground hover:bg-white/10 hover:text-rail-foreground transition-[width,margin,padding] duration-200 ease-linear [&>svg]:size-4!',
           expanded ? 'w-full px-2' : 'ml-0.5 w-7 px-1.5',
           expanded && onPinnedChange && 'pr-8',
-          active && 'bg-primary/10 text-primary hover:bg-primary/10',
+          active && 'bg-rail-active hover:bg-rail-active',
         )}
         onClick={onSelect}
         size="default"
         variant="ghost"
       >
-        {active && (
-          <span className="absolute -left-1 top-2 bottom-2 w-0.5 rounded-full bg-primary" />
-        )}
         <Icon
           className={cn(
-            'size-4 text-accent-foreground',
-            active && 'text-primary',
+            'size-4 text-rail-foreground/80',
+            active && 'text-rail-foreground',
           )}
         />
         <NavigationRailLabel
@@ -58,7 +55,7 @@ export const NavigationActivityButton = ({
       {expanded && onPinnedChange && pinned !== undefined && (
         <NavigationActivityPinButton
           activity={activity}
-          className="absolute top-0 right-0 opacity-0 group-focus-within/activity:opacity-100 group-hover/activity:opacity-100"
+          className="absolute top-0 right-0 text-rail-muted opacity-0 hover:bg-white/10 hover:text-rail-foreground group-focus-within/activity:opacity-100 group-hover/activity:opacity-100"
           pinned={pinned}
           onPinnedChange={onPinnedChange}
         />

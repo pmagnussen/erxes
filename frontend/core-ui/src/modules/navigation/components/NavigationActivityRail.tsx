@@ -7,7 +7,11 @@ import { NavigationActivityMore } from '@/navigation/components/NavigationActivi
 import { NavigationRailLogo } from '@/navigation/components/NavigationRailLogo';
 import { NavigationSidebarFooter } from '@/navigation/components/NavigationSidebarFooter';
 import { INavigationActivity } from '@/navigation/types/NavigationActivity';
-import { splitPromotedNavigationActivities } from '@/navigation/utils/promotedNavigationActivities';
+import {
+  getPromotedNavigationRank,
+  NAVIGATION_SEARCH_RANK,
+  splitPromotedNavigationActivities,
+} from '@/navigation/utils/promotedNavigationActivities';
 import { cn, Sidebar } from 'erxes-ui';
 
 export const NavigationActivityRail = ({
@@ -44,12 +48,22 @@ export const NavigationActivityRail = ({
   const visibleRest = splitPromotedNavigationActivities(visibleActivities).rest;
   const hiddenRest = splitPromotedNavigationActivities(hiddenActivities).rest;
   const usePromotedRail = promoted.length > 0;
+  const isAboveSearch = (activity: INavigationActivity) =>
+    (getPromotedNavigationRank(activity) ?? 0) < NAVIGATION_SEARCH_RANK;
+  const renderPromoted = (activity: INavigationActivity) => (
+    <NavigationActivityButton
+      key={activity.id}
+      activity={activity}
+      active={!isSettings && activity.id === activeActivityId}
+      expanded={expanded}
+      onSelect={() => onSelectActivity(activity)}
+    />
+  );
 
   return (
     <aside
       className={cn(
-        'flex w-full shrink-0 flex-col border-none bg-sidebar px-2 py-2',
-        !expanded && 'border-r!',
+        'flex w-full shrink-0 flex-col border-none bg-rail px-2 py-2 text-rail-foreground',
         isMobile && !expanded && 'w-12',
       )}
     >
@@ -61,19 +75,14 @@ export const NavigationActivityRail = ({
             isInboxActive={isInboxActive}
             onSelectInbox={onSelectInbox}
           />
+          {promoted.filter(isAboveSearch).map(renderPromoted)}
           <NavigationActivitySearchButton
             expanded={expanded}
             onSearch={onSearch}
           />
-          {promoted.map((activity) => (
-            <NavigationActivityButton
-              key={activity.id}
-              activity={activity}
-              active={!isSettings && activity.id === activeActivityId}
-              expanded={expanded}
-              onSelect={() => onSelectActivity(activity)}
-            />
-          ))}
+          {promoted
+            .filter((activity) => !isAboveSearch(activity))
+            .map(renderPromoted)}
         </div>
       ) : (
         <NavigationActivitySearchButton

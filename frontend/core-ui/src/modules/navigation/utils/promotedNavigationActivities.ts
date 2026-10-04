@@ -1,10 +1,18 @@
 import { INavigationActivity } from '@/navigation/types/NavigationActivity';
 
-/** Rail order under Search: Command, then AI Agent. Matched on plugin defaultPath. */
+/**
+ * Dixa-style rail order, matched on activity defaultPath:
+ * Conversations, Contacts, (Search), Command, AI Agent.
+ * Activities ranked below NAVIGATION_SEARCH_RANK render above the Search button.
+ */
 const PROMOTED_NAVIGATION_RANK: Record<string, number> = {
-  'cf-os': 0,
-  'erxes-agent': 1,
+  'frontline/inbox': 0,
+  contacts: 1,
+  'cf-os': 2,
+  'erxes-agent': 3,
 };
+
+export const NAVIGATION_SEARCH_RANK = 2;
 
 const trimPath = (path: string) => path.replace(/^\/+|\/+$/g, '');
 

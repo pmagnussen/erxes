@@ -31,9 +31,9 @@ export const NavigationSidebarFooter = ({
       <Button
         asChild
         className={cn(
-          'h-7 shrink-0 justify-start gap-2 rounded-md text-sm transition-[width,margin,padding] duration-200 ease-linear [&>svg]:size-4!',
+          'h-7 shrink-0 justify-start gap-2 rounded text-sm text-rail-foreground hover:bg-white/10 hover:text-rail-foreground transition-[width,margin,padding] duration-200 ease-linear [&>svg]:size-4!',
           expanded ? 'w-full px-2' : 'ml-0.5 w-7 px-1.5',
-          isSettings && 'bg-primary/10',
+          isSettings && 'bg-rail-active hover:bg-rail-active',
         )}
         size="default"
         variant="ghost"
@@ -44,8 +44,8 @@ export const NavigationSidebarFooter = ({
         >
           <IconSettings
             className={cn(
-              'size-4 text-accent-foreground',
-              isSettings && 'text-primary',
+              'size-4 text-rail-foreground/80',
+              isSettings && 'text-rail-foreground',
             )}
           />
           <NavigationRailLabel
@@ -61,7 +61,7 @@ export const NavigationSidebarFooter = ({
           <Button
             aria-label={sidebarT('profile')}
             className={cn(
-              'h-10 shrink-0 justify-start gap-2 rounded-md text-sm transition-[width,margin,padding] duration-200 ease-linear',
+              'h-10 shrink-0 justify-start gap-2 rounded text-sm text-rail-foreground hover:bg-white/10 hover:text-rail-foreground transition-[width,margin,padding] duration-200 ease-linear',
               expanded ? 'w-full px-1' : 'ml-0.5 w-7 gap-0 px-0.5',
             )}
             size="default"
@@ -81,7 +81,7 @@ export const NavigationSidebarFooter = ({
               expanded={expanded}
             >
               <span className="truncate font-medium">{userName}</span>
-              <span className="truncate text-[11px] text-muted-foreground">
+              <span className="truncate text-[11px] text-rail-muted">
                 {currentUser?.email}
               </span>
             </NavigationRailLabel>
