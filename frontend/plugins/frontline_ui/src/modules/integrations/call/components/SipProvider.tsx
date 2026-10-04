@@ -35,6 +35,8 @@ import { historyIdAtom } from '@/integrations/call/states/callStates';
 // Context for SIP functionality
 const SipContext = createContext<SipContextValue | null>(null);
 
+const ICE_READY_TIMEOUT_MS = 2000;
+
 const SipProvider = ({
   host = null,
   port = null,
@@ -460,6 +462,28 @@ const SipProvider = ({
         }
 
         setRtcSessionState(rtcSession);
+
+        // JsSIP waits for ICE gathering to finish before sending the SDP,
+        // which stalls ~40s on unreachable candidates. Send once a
+        // public-facing candidate exists, or after ICE_READY_TIMEOUT_MS.
+        let iceReadyTimer: ReturnType<typeof setTimeout> | undefined;
+        rtcSession.on(
+          'icecandidate',
+          (event: {
+            candidate: RTCIceCandidate;
+            ready: () => void;
+          }) => {
+            const type = event.candidate?.type;
+            if (type === 'srflx' || type === 'relay') {
+              clearTimeout(iceReadyTimer);
+              event.ready();
+              return;
+            }
+            if (!iceReadyTimer) {
+              iceReadyTimer = setTimeout(event.ready, ICE_READY_TIMEOUT_MS);
+            }
+          },
+        );
 
         let direction = CallDirectionEnum.OUTGOING;
         let customerPhone = '';

@@ -48,22 +48,31 @@ export const SipContainer = ({ children }: { children: React.ReactNode }) => {
 
   const operator = operators?.[0];
 
+  // Browsers reject the whole RTCPeerConnection when a TURN entry has no
+  // URL or credentials, so only include servers that are fully configured.
+  const iceServers: RTCIceServer[] = [];
+  if (
+    callConfigs.TURN_SERVER_URL &&
+    callConfigs.TURN_SERVER_USERNAME &&
+    callConfigs.TURN_SERVER_CREDENTIAL
+  ) {
+    iceServers.push({
+      urls: `turn:${callConfigs.TURN_SERVER_URL}`,
+      username: callConfigs.TURN_SERVER_USERNAME,
+      credential: callConfigs.TURN_SERVER_CREDENTIAL,
+    });
+  }
+  if (callConfigs.STUN_SERVER_URL) {
+    iceServers.push({ urls: `stun:${callConfigs.STUN_SERVER_URL}` });
+  }
+
   const sipConfig = {
     host,
     pathname: '/ws',
     user: operator?.gsUsername,
     password: operator?.gsPassword,
     port: Number.parseInt(port?.toString() || '8089', 10),
-    iceServers: [
-      {
-        urls: `turn:${callConfigs.TURN_SERVER_URL}`,
-        username: callConfigs.TURN_SERVER_USERNAME,
-        credential: callConfigs.TURN_SERVER_CREDENTIAL,
-      },
-      {
-        urls: `stun:${callConfigs.STUN_SERVER_URL}`,
-      },
-    ],
+    iceServers,
   };
 
   return (
