@@ -46,6 +46,7 @@ import { useIntegrationInline } from '@/integrations/hooks/useIntegrations';
 type ConversationFilterQueries = {
   status: ConversationStatus;
   unassigned: boolean;
+  assignedTo: string;
   awaitingResponse: boolean;
   automationStatus: TAutomationStatusFilter;
   participated: boolean;
@@ -198,6 +199,10 @@ const ConversationFilterCommand = ({
           {t('awaiting-response', 'Awaiting response')}
         </ConversationFilterCommandItem>
         <AutomationStatusFilterItem />
+        <SelectMember.FilterItem
+          value="assignedTo"
+          label={t('assigned-to', 'Assigned to')}
+        />
         <SelectChannel.FilterItem />
         <IntegrationTypeFilterItem />
         <Command.Separator className="my-1" />
@@ -214,6 +219,7 @@ export const FilterConversationsPopover = () => {
   const [queries, setQueries] = useMultiQueryState<ConversationFilterQueries>([
     'status',
     'unassigned',
+    'assignedTo',
     'awaitingResponse',
     'automationStatus',
     'participated',
@@ -248,6 +254,7 @@ export const FilterConversationsPopover = () => {
           />
         </Filter.View>
         <SelectMember.FilterView
+          queryKey="assignedTo"
           onValueChange={() => setQueries({ unassigned: null })}
         />
         <SelectChannel.FilterView />
@@ -273,6 +280,7 @@ export const ConversationFilterBar = ({
   const filterStates = useNonNullMultiQueryState<{
     status: ConversationStatus;
     unassigned: boolean;
+    assignedTo: string;
     awaitingResponse: boolean;
     automationStatus: TAutomationStatusFilter;
     participated: boolean;
@@ -287,6 +295,7 @@ export const ConversationFilterBar = ({
   }>([
     'status',
     'unassigned',
+    'assignedTo',
     'awaitingResponse',
     'automationStatus',
     'participated',
@@ -358,6 +367,10 @@ export const ConversationFilterBar = ({
           {t('mentions', 'Mentions', { defaultValue: 'Mentions' })}
         </Filter.BarName>
       </Filter.BarItem>
+      <SelectMember.FilterBar
+        queryKey="assignedTo"
+        label={t('assigned-to', 'Assigned to')}
+      />
       <AutomationStatusFilterBar iconOnly />
       <SelectChannel.FilterBar iconOnly />
       <IntegrationTypeFilterBar iconOnly />

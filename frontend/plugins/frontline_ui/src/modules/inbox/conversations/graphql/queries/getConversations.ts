@@ -11,6 +11,7 @@ export const GET_CONVERSATIONS = gql`
     $integrationId: String
     $status: String
     $unassigned: String
+    $assignedUserId: String
     $tag: String
     $integrationType: String
     $starred: String
@@ -33,6 +34,7 @@ export const GET_CONVERSATIONS = gql`
       integrationId: $integrationId
       status: $status
       unassigned: $unassigned
+      assignedUserId: $assignedUserId
       tag: $tag
       integrationType: $integrationType
       starred: $starred
@@ -55,6 +57,7 @@ export const GET_CONVERSATIONS = gql`
       content
       createdAt
       updatedAt
+      status
       integrationId
       customer {
         _id

@@ -29,6 +29,7 @@ export interface IListArgs {
   tag?: string;
   integrationType?: string;
   participating?: string;
+  assignedUserId?: string;
   mentioned?: string;
   unread?: string;
   starred?: string;
@@ -266,6 +267,17 @@ export default class Builder {
     };
   }
 
+  public assignedUserFilter(assignedUserId: string): {
+    assignedUserId: string | IIn;
+  } {
+    const ids = assignedUserId
+      .split(',')
+      .map((id) => (id.trim() === 'me' ? this.user._id : id.trim()))
+      .filter(Boolean);
+
+    return { assignedUserId: ids.length === 1 ? ids[0] : { $in: ids } };
+  }
+
   public async mentionedFilter(): Promise<{ _id: IIn }> {
     const conversationIds: string[] =
       await this.models.ConversationMessages.distinct('conversationId', {
@@ -499,6 +511,7 @@ export default class Builder {
       integrations: {},
 
       participating: {},
+      assignedUser: {},
       mentioned: {},
       unread: {},
       createdAt: {},
@@ -519,6 +532,12 @@ export default class Builder {
 
     if (this.params.participating) {
       this.queries.participating = this.participatingFilter();
+    }
+
+    if (this.params.assignedUserId) {
+      this.queries.assignedUser = this.assignedUserFilter(
+        this.params.assignedUserId,
+      );
     }
 
     if (this.params.mentioned) {
@@ -578,6 +597,7 @@ export default class Builder {
       ...this.queries.extended,
       ...this.queries.unassigned,
       ...this.queries.participating,
+      ...this.queries.assignedUser,
       ...this.queries.mentioned,
       ...this.queries.unread,
       ...this.queries.status,

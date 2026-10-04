@@ -198,6 +198,7 @@ const mutationFilterParams = `
   tag: String
   integrationType: String
   participating: String
+  assignedUserId: String
   mentioned: String
   unread: String
   awaitingResponse: String

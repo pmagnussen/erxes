@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Badge,
   BlockEditorReadOnly,
   Button,
   Checkbox,
@@ -11,6 +12,7 @@ import {
   useQueryState,
 } from 'erxes-ui';
 import {
+  IconArrowRight,
   IconPhoneIncoming,
   IconPhoneOutgoing,
   IconPhoneX,
@@ -19,6 +21,7 @@ import { useConversationContext } from '../hooks/useConversationContext';
 import { currentUserState, CustomersInline, MembersInline } from 'ui-modules';
 import { DiscordConversationChannel } from '@/integrations/discord/hooks/useDiscordSetup';
 import { IntegrationType } from '@/types/Integration';
+import { ConversationStatus } from '@/inbox/types/Conversation';
 import {
   CALL_STATUS_LABEL_KEYS,
   NOT_ANSWERED_STATUSES,
@@ -47,8 +50,16 @@ export const ConversationItem = ({
   const { t } = useTranslation('frontline');
   const inboxLayout = useInboxLayout();
 
-  const { createdAt, updatedAt, customer, integration } =
-    useConversationContext();
+  const {
+    _id,
+    createdAt,
+    updatedAt,
+    customer,
+    integration,
+    status,
+    assignedUserId,
+    assignedUser,
+  } = useConversationContext();
   const { channel } = integration || {};
 
   const channelProfileName = channelInfo?.channelName;
@@ -106,40 +117,95 @@ export const ConversationItem = ({
   }
 
   return (
-    <ConversationContainer onConversationSelect={onConversationSelect}>
+    <ConversationContainer
+      className="h-auto py-2 items-start"
+      onConversationSelect={onConversationSelect}
+    >
       <CustomersInline.Provider customers={customer ? [customer] : []}>
         {/* skipcq: JS-0357 */}
         <ConversationSelector
           channelLetter={channelLetter}
           isPending={channelInfoPending}
         />
-        {channelInfoPending ? (
-          <Skeleton className="w-56 h-4 flex-none" />
-        ) : channelProfileName ? (
-          <span
-            className="w-56 truncate flex-none text-foreground"
-            title={`#${channelProfileName}`}
-          >
-            #{channelProfileName}
-          </span>
-        ) : (
-          <CustomersInline.Title className="w-56 truncate flex-none text-foreground" />
-        )}
-        <ConversationItemContent />
-        <div className="w-auto text-right flex-none">
-          <span> {t('to', 'to')} </span>
-          {channel && <span title={channel.name}>{channel.name}</span>}
-          <span> {t('via', 'via')} </span>
-          {integration && (
-            <span title={integration.kind}>{integration.kind}</span>
-          )}
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <div className="flex min-w-0 items-center gap-2">
+            {channelInfoPending ? (
+              <Skeleton className="w-40 h-4 flex-none" />
+            ) : channelProfileName ? (
+              <span
+                className="truncate font-semibold text-foreground"
+                title={`#${channelProfileName}`}
+              >
+                #{channelProfileName}
+              </span>
+            ) : (
+              <CustomersInline.Title className="max-w-56 truncate font-semibold text-foreground" />
+            )}
+            <span className="flex-none text-xs text-muted-foreground tabular-nums">
+              #{_id?.slice(-6)}
+            </span>
+            <ConversationItemContent />
+          </div>
+          <div className="flex min-w-0 items-center gap-1 truncate text-xs font-normal text-muted-foreground">
+            {createdAt && (
+              <span className="flex-none">
+                {t('created', 'created')}{' '}
+                <RelativeDateDisplay.Value value={createdAt} isShort />
+              </span>
+            )}
+            <span>·</span>
+            <span className="truncate">
+              {assignedUser?.details?.fullName
+                ? `${t('assigned-to', 'assigned to')} ${
+                    assignedUser.details.fullName
+                  }`
+                : t('unassigned', 'Unassigned')}
+            </span>
+            {channel && (
+              <>
+                <span>·</span>
+                <span className="flex items-center gap-1 truncate" title={channel.name}>
+                  {t('in', 'in')}
+                  <IconComponent name={channel.icon} className="size-3" />
+                  {channel.name}
+                </span>
+              </>
+            )}
+            {integration?.kind && (
+              <>
+                <span>·</span>
+                <span className="truncate" title={integration.kind}>
+                  {t('via', 'via')} {integration.kind}
+                </span>
+              </>
+            )}
+          </div>
         </div>
-        <div className="w-32 text-right flex-none">
-          {createdAt && (
-            <RelativeDateDisplay value={updatedAt || createdAt}>
-              <RelativeDateDisplay.Value value={updatedAt || createdAt} />
-            </RelativeDateDisplay>
+        <div className="flex flex-none items-center gap-1 self-center">
+          <CustomersInline.Avatar size="sm" />
+          <IconArrowRight className="size-3 text-muted-foreground" />
+          {assignedUserId ? (
+            <MembersInline.Provider memberIds={[assignedUserId]}>
+              <MembersInline.Avatar size="sm" />
+            </MembersInline.Provider>
+          ) : (
+            <Avatar size="sm">
+              <Avatar.Fallback className="text-muted-foreground">?</Avatar.Fallback>
+            </Avatar>
           )}
+          <Badge
+            variant={status === ConversationStatus.CLOSED ? 'secondary' : 'success'}
+            className="ml-2 w-16 justify-center text-xs capitalize"
+          >
+            {status === ConversationStatus.CLOSED
+              ? t('resolved', 'Resolved')
+              : t('open', 'Open')}
+          </Badge>
+          <span className="w-20 text-right text-xs text-muted-foreground">
+            {(updatedAt || createdAt) && (
+              <RelativeDateDisplay.Value value={updatedAt || createdAt} isShort />
+            )}
+          </span>
         </div>
       </CustomersInline.Provider>
     </ConversationContainer>

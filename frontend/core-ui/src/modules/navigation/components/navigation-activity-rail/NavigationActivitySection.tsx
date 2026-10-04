@@ -24,7 +24,7 @@ export const NavigationActivitySection = ({
         <div className="relative h-6 w-full shrink-0">
           <Collapsible.Trigger
             className={cn(
-              'absolute inset-0 flex w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md px-2 text-left font-sans text-xs font-semibold uppercase tracking-wide text-rail-muted transition-opacity duration-100 ease-linear hover:bg-white/10 motion-reduce:transition-none',
+              'absolute inset-0 flex w-full items-center gap-2 overflow-hidden whitespace-nowrap rounded-md px-2 text-left font-sans text-[11px] font-bold uppercase tracking-wider text-white/75 transition-opacity duration-100 ease-linear hover:bg-white/10 motion-reduce:transition-none',
               expanded
                 ? 'delay-100 opacity-100'
                 : 'pointer-events-none delay-0 opacity-0',

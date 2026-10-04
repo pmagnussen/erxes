@@ -3,6 +3,7 @@ import { useConversationListContext } from '@/inbox/conversations/hooks/useConve
 import { ConversationFilterBar } from '@/inbox/conversations/components/ConversationsFilter';
 import { useInboxLayout } from '@/inbox/hooks/useInboxLayout';
 import { useTranslation } from 'react-i18next';
+import { ConversationScopeToggle } from '@/inbox/conversations/components/ConversationScopeToggle';
 
 export const ConversationCount = ({ className }: { className?: string }) => {
   const { t } = useTranslation('frontline');
@@ -35,7 +36,10 @@ export const ConversationsHeader = ({
   return (
     <Filter id="conversations-filter-bar">
       <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 overflow-hidden bg-sidebar py-2 pl-6 pr-4">
-        <div className="order-1 flex shrink-0 items-center">{children}</div>
+        <div className="order-1 flex shrink-0 items-center gap-2">
+          {children}
+          <ConversationScopeToggle />
+        </div>
         <ConversationFilterBar
           className={cn(
             'order-3 basis-full',

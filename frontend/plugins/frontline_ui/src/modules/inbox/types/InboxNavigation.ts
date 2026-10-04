@@ -1,4 +1,5 @@
 export type TInboxNavigationFilters = {
+  assignedTo: string;
   awaitingResponse: boolean;
   brandId: string;
   channelId: string;
@@ -21,6 +22,7 @@ export const INBOX_NAVIGATION_FILTER_KEYS: Array<
   'participating',
   'mentioned',
   'unassigned',
+  'assignedTo',
   'awaitingResponse',
   'channelId',
   'integrationId',
@@ -31,6 +33,7 @@ export const INBOX_NAVIGATION_FILTER_KEYS: Array<
 ];
 
 export const CLEARED_INBOX_NAVIGATION_FILTERS: TInboxNavigationFilterValues = {
+  assignedTo: null,
   awaitingResponse: null,
   brandId: null,
   channelId: null,

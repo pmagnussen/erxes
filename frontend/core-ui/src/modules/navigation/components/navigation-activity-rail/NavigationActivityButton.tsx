@@ -50,7 +50,11 @@ export const NavigationActivityButton = ({
         >
           {activity.label}
         </NavigationRailLabel>
-        {expanded && indicator}
+        {expanded && indicator && (
+          <span className="ml-auto flex shrink-0 items-center [&_[data-slot=badge]]:bg-white [&_[data-slot=badge]]:text-rail-background [&>*]:bg-white [&>*]:font-semibold [&>*]:text-rail-background">
+            {indicator}
+          </span>
+        )}
       </Button>
       {expanded && onPinnedChange && pinned !== undefined && (
         <NavigationActivityPinButton

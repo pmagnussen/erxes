@@ -8,6 +8,7 @@ export const INBOX_CONVERSATION_QUERY_KEYS: (keyof InboxConversationQueryState)[
     'integrationId',
     'integrationType',
     'unassigned',
+    'assignedTo',
     'awaitingResponse',
     'withSurvey',
     'automationStatus',

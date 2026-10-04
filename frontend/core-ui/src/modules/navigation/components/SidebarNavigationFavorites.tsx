@@ -54,7 +54,7 @@ export function SidebarNavigationFavoritesItem({
       )}
       path={pathWithoutUi}
       className={cn(
-        'h-7 justify-start rounded-md text-sm transition-[width,margin,padding] duration-200 ease-linear',
+        'h-7 justify-start rounded-md text-sm text-rail-foreground hover:bg-white/10 hover:text-rail-foreground [&_svg]:text-rail-foreground/80 transition-[width,margin,padding] duration-200 ease-linear',
         expanded ? 'w-full px-2' : 'ml-0.5 w-7 px-1.5',
         'group-data-[collapsible=icon]:[&&]:h-7! group-data-[collapsible=icon]:[&&]:w-7! group-data-[collapsible=icon]:[&&]:px-1.5!',
       )}
