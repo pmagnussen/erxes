@@ -1,5 +1,3 @@
-import { useAuth } from '@/auth/hooks/useAuth';
-import { SelectLanguages } from '@/navigation/components/SelectLanguages';
 import { ThemeSelector } from '@/navigation/components/ThemeSelector';
 import { User } from '@/navigation/components/User';
 import { NavigationRailLabel } from '@/navigation/components/NavigationRailLabel';
@@ -20,7 +18,6 @@ export const NavigationSidebarFooter = ({
   isSettings: boolean;
 }) => {
   const currentUser = useAtomValue(currentUserState);
-  const { handleLogout } = useAuth();
   const { t: organizationT } = useTranslation('organization');
   const { t: sidebarT } = useTranslation('common', { keyPrefix: 'sidebar' });
   const userDetails = currentUser?.details;
@@ -100,15 +97,8 @@ export const NavigationSidebarFooter = ({
             </Link>
           </DropdownMenu.Item>
           <DropdownMenu.Separator />
+          {/* vera.fo: language and logout are owned by the vera portal */}
           <ThemeSelector />
-          <SelectLanguages />
-          <DropdownMenu.Separator />
-          <DropdownMenu.Item
-            className="h-7 py-0 text-sm"
-            onClick={() => handleLogout()}
-          >
-            {organizationT('logout')}
-          </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu>
     </div>
