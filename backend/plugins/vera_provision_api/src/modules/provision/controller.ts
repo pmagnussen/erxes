@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { getEnv, getSubdomain, sendTRPCMessage } from 'erxes-api-shared/utils';
 import { initSchema, TInitInput } from '@/provision/schema';
+import { provisionSales } from '@/provision/sales';
+import { IErxesUser } from '@/sso/session';
 
 interface IStep {
   step: string;
@@ -198,6 +200,25 @@ export const initWorkspace = async (req: Request, res: Response) => {
           }
         : { error: `Channel ${input.facebook.channel} missing` }),
     });
+  }
+
+  if (input.sales) {
+    const owner = (await run(steps, 'sales-owner', () =>
+      call(subdomain, 'core', 'query', 'users', 'findOne', {
+        query: { isOwner: true, isActive: { $ne: false } },
+      }).then((u: IErxesUser | null) => {
+        if (!u?._id) {
+          throw new Error('No active owner user');
+        }
+        return { _id: u._id, isOwner: true };
+      }),
+    )) as IErxesUser | undefined;
+
+    if (owner) {
+      await provisionSales(owner, input.sales, (step, work) =>
+        run(steps, step, work),
+      );
+    }
   }
 
   const failed = steps.some((s) => s.status === 'error');

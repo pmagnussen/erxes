@@ -10,7 +10,10 @@ Tenant.Backend to set up a tenant's erxes without opening the UI.
 - `POST /provision/init` — idempotent; body in `src/modules/provision/schema.ts`.
   Steps: brand (core `brands`), team channels, mail inbox on external
   IMAP/SMTP, ticket pipeline (+ own mailbox), Facebook = `pending` with a
-  `connectUrl` the customer opens to sign in. 200 all ok, 207 some step failed
+  `connectUrl` the customer opens to sign in; optional `sales: {}` = starter
+  kit (DKK/EUR, units, product categories, board `Søla`, pipeline `Sølurás`
+  with stages + labels; `src/modules/provision/sales.ts`, idempotent, writes
+  via gateway GraphQL as the owner since sales has no tRPC writes). 200 all ok, 207 some step failed
   (re-run to fix).
 - `GET /provision` — brands, channels, pipelines, mail (no passwords).
 - Owns no data. All writes go via tRPC: core `brands.*`, frontline
