@@ -1,13 +1,11 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { Request, Response } from 'express';
-import * as jwt from 'jsonwebtoken';
+import { authCookieOptions, getEnv } from 'erxes-api-shared/utils';
 import {
-  authCookieOptions,
-  getEnv,
-  getSubdomain,
-  redis,
-  sendTRPCMessage,
-} from 'erxes-api-shared/utils';
+  createErxesSession,
+  findErxesUser,
+  SESSION_TTL_SECONDS,
+} from '@/sso/session';
 
 /**
  * Keycloak SSO: a user already signed in to their vera.fo realm lands in erxes
@@ -20,7 +18,6 @@ import {
  */
 const STATE_COOKIE = 'vera-sso';
 const CALLBACK_PATH = '/gateway/pl:veraprovision/sso/callback';
-const TOKEN_TTL_SECONDS = 24 * 60 * 60;
 
 interface ISsoConfig {
   issuer: string;
@@ -33,12 +30,6 @@ interface ISsoState {
   state: string;
   verifier: string;
   redirect: string;
-}
-
-interface IErxesUser {
-  _id?: string;
-  isOwner?: boolean;
-  isActive?: boolean;
 }
 
 const getConfig = (): ISsoConfig | null => {
@@ -193,42 +184,19 @@ export const ssoCallback = async (req: Request, res: Response) => {
       return;
     }
 
-    const user = (await sendTRPCMessage({
-      subdomain: getSubdomain(req),
-      pluginName: 'core',
-      method: 'query',
-      module: 'users',
-      action: 'findOne',
-      input: {
-        query: {
-          email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' },
-          isActive: { $ne: false },
-        },
-      },
-    })) as IErxesUser | null;
-
+    const user = await findErxesUser(req, email);
     if (!user?._id) {
       fail(res, config, 'nouser');
       return;
     }
 
-    const token = jwt.sign(
-      { user: { _id: user._id, isOwner: !!user.isOwner } },
-      getEnv({ name: 'JWT_TOKEN_SECRET' }),
-      { expiresIn: TOKEN_TTL_SECONDS },
-    );
-    await redis.set(
-      `user_token_${user._id}_${token}`,
-      1,
-      'EX',
-      TOKEN_TTL_SECONDS,
-    );
+    const token = await createErxesSession(user);
 
     res.clearCookie(STATE_COOKIE, { path: CALLBACK_PATH });
     res.cookie(
       'auth-token',
       token,
-      authCookieOptions({ sameSite: 'lax', expires: TOKEN_TTL_SECONDS * 1000 }),
+      authCookieOptions({ sameSite: 'none', expires: SESSION_TTL_SECONDS * 1000 }),
     );
     res.redirect(config.domain + saved.redirect);
   } catch {

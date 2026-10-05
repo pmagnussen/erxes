@@ -15,3 +15,9 @@ Tenant.Backend to set up a tenant's erxes without opening the UI.
 - `GET /provision` — brands, channels, pipelines, mail (no passwords).
 - Owns no data. All writes go via tRPC: core `brands.*`, frontline
   `mailProvision.*` (`frontline_api/.../integrations/mail/trpc/provision.ts`).
+- SSO (`src/modules/sso`, no Bearer auth, needs `VERA_SSO_ISSUER`/`_CLIENT_ID`/
+  `_CLIENT_SECRET`): `GET /sso/start` + `/sso/callback` = OIDC prompt=none
+  against the tenant realm; `POST /sso/token {token}` = vera.fo Tenant.CRM
+  wrapper hands over the portal's Keycloak access token (verified via realm
+  JWKS, CORS limited to same registrable domain). Both match the erxes user
+  by email (no auto-provisioning) and set `auth-token` (SameSite=None).
