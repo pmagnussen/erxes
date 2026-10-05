@@ -66,6 +66,14 @@ const readCookie = (req: Request, name: string) => {
 const fail = (res: Response, config: ISsoConfig | null, reason: string) => {
   const base = config?.domain || '';
   res.clearCookie(STATE_COOKIE, { path: CALLBACK_PATH });
+  // No Keycloak session: send the user to the vera.fo portal to sign in there
+  // (it opens erxes via Tenant.CRM afterwards). /login?sso=off keeps the
+  // plain erxes form reachable for admins.
+  const portal = getEnv({ name: 'VERA_PORTAL_URL' }).replace(/\/$/, '');
+  if (reason === 'none' && portal) {
+    res.redirect(portal);
+    return;
+  }
   res.redirect(`${base}/login?sso=${encodeURIComponent(reason)}`);
 };
 

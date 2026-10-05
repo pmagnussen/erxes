@@ -21,3 +21,5 @@ Tenant.Backend to set up a tenant's erxes without opening the UI.
   wrapper hands over the portal's Keycloak access token (verified via realm
   JWKS, CORS limited to same registrable domain). Both match the erxes user
   by email (no auto-provisioning) and set `auth-token` (SameSite=None).
+  `VERA_PORTAL_URL` (e.g. https://<t>.vera.fo/crm): no Keycloak session ->
+  redirect there instead of the erxes form; `/login?sso=off` = plain form.
