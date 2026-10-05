@@ -112,3 +112,25 @@ export const initSchema = z.object({
 });
 
 export type TInitInput = z.infer<typeof initSchema>;
+
+/** POST /provision/products — catalog pushed by vera.fo (source: e-conomic). */
+export const productsSyncSchema = z.object({
+  categories: z
+    .array(z.object({ code: z.string().min(1), name: z.string().min(1) }))
+    .default([]),
+  products: z.array(
+    z.object({
+      code: z.string().min(1),
+      name: z.string().min(1),
+      description: z.string().optional(),
+      categoryCode: z.string().optional(),
+      unitPrice: z.number().default(0),
+      currency: z.string().length(3).default('DKK'),
+      uom: z.string().min(1).default('stk'),
+      type: z.enum(['product', 'service']).default('product'),
+      barred: z.boolean().default(false),
+    }),
+  ),
+});
+
+export type TProductsSyncInput = z.infer<typeof productsSyncSchema>;
