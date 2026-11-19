@@ -16,7 +16,7 @@ COPY . .
 RUN pnpm nx build frontline-widgets --configuration=production --verbose
 
 # Final stage
-FROM nginx:alpine
+FROM nginx:1.31.9-alpine
 
 # Copy jo from builder
 COPY --from=jo-builder /usr/local/bin/jo /usr/local/bin/jo
